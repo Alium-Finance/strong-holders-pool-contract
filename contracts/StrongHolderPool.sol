@@ -82,7 +82,7 @@ contract StrongHolderPool is IStrongHolder, Ownable {
         }
     }
 
-    function percentFrom(uint _percent, uint _value) public view returns (uint256 result) {
+    function percentFrom(uint _percent, uint _value) public pure returns (uint256 result) {
         result = _percent * _value / 100;
     }
 
@@ -147,16 +147,16 @@ contract StrongHolderPool is IStrongHolder, Ownable {
         uint l = pool.users.length;
         for (uint i; i < l; i++) {
             if (
-                pool.users[i].account != msg.sender &&
+                pool.users[i].account != _to &&
                 l - 1 == i
             ) {
                 pool.users.push(User({
-                account: msg.sender,
+                account: _to,
                 balance: _amount,
                 paid: false,
                 leftId: 0
                 }));
-            } else if (pool.users[i].account == msg.sender) {
+            } else if (pool.users[i].account == _to) {
                 pool.users[i].balance += _amount;
                 return;
             }
