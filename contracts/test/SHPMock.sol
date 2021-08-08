@@ -14,8 +14,8 @@ import "../StrongHolderPool.sol";
 contract SHPMock is StrongHolderPool {
 
     constructor(address _aliumToken) StrongHolderPool(_aliumToken) {
-        for (uint i; i < 100; i++) {
-            _lock(address(uint160(i+1)), i+1 * 100_000);
+        for (uint i = 1; i <= 100; i++) {
+            _lock(address(uint160(i)), i * 100_000);
         }
     }
 
