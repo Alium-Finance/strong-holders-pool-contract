@@ -19,13 +19,17 @@ contract SHPMock is StrongHolderPool {
     }
 
     constructor(address _aliumToken) StrongHolderPool(_aliumToken) {
+        //
+    }
+
+    function fastLock() external {
         for (uint i = 1; i <= 100; i++) {
             _lock(address(uint160(i)), 100_000);
         }
     }
 
     function lockBatch(LockBatchInput[] memory _input) external {
-        for (uint i = 1; i <= 100; i++) {
+        for (uint i = 0; i < _input.length; i++) {
             _lock(_input[i].account, _input[i].amount);
         }
     }

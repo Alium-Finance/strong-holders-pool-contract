@@ -61,9 +61,45 @@ describe("StrongHolderPool", function() {
     })
 
     describe('getters', () => {
-        it('#percentFrom', async () => {})
-        it('#getPoolWithdrawPosition', async () => {})
-        it('#totalLockedPoolTokens', async () => {})
+        it('#percentFrom', async () => {
+            assert.equal(await shp.percentFrom(10, 100), 10)
+            assert.equal(await shp.percentFrom(20, 100), 20)
+            assert.equal(await shp.percentFrom(35, 100), 35)
+        })
+        it('#getPoolWithdrawPosition', async () => {
+            const SHPMock = await ethers.getContractFactory("SHPMock");
+            const sphMock = await SHPMock.deploy(alm.address);
+
+            expectRevert(sphMock.getPoolWithdrawPosition(0), "Only whole pool");
+
+            await alm.mint(sphMock.address, 100_000 * 100)
+            await sphMock.fastLock()
+
+            assert.equal((await sphMock.getPoolWithdrawPosition(0)).toString(), 100)
+
+            for (let i = 0; i < 100; i++) {
+                let address = await sphMock.getAddress(i+1);
+                await sphMock.withdrawTo(0, address)
+                if (i == 100-1) {
+                    expectRevert(sphMock.getPoolWithdrawPosition(0), "Pool is empty");
+                } else {
+                    assert.equal((await sphMock.getPoolWithdrawPosition(0)).toString(), 100-(i+1))
+                }
+            }
+        })
+        it('#totalLockedPoolTokens', async () => {
+            const SHPMock = await ethers.getContractFactory("SHPMock");
+            const sphMock = await SHPMock.deploy(alm.address);
+
+            assert.equal((await sphMock.totalLockedPoolTokens(0)).toString(), 0)
+
+            await alm.mint(ALICE, 100_000)
+
+            await alm.connect(ALICE_SIGNER).approve(sphMock.address, MaxUint256)
+            await sphMock.connect(ALICE_SIGNER).lock(ALICE, 100_000)
+
+            assert.equal((await sphMock.totalLockedPoolTokens(0)).toString(), 100_000)
+        })
         it('#totalLockedPoolTokensFrom', async () => {})
     })
 
@@ -93,9 +129,11 @@ describe("StrongHolderPool", function() {
             assert.equal((await shp.currentPoolLength()).toString(), 2, 'Wrong pool length 2')
         })
 
-        it.only('#lock mock', async () => {
+        it('#lock mock', async () => {
             const SHPMock = await ethers.getContractFactory("SHPMock");
             const sphMock = await SHPMock.deploy(alm.address);
+
+            await sphMock.fastLock()
 
             assert.equal(await sphMock.poolLength(0), 100, 'Bed pool length')
 
@@ -200,6 +238,8 @@ describe("StrongHolderPool", function() {
             const SHPMock = await ethers.getContractFactory("SHPMock");
             const sphMock = await SHPMock.deploy(alm.address);
 
+            await sphMock.fastLock()
+
             assert.equal(await sphMock.poolLength(0), 100, 'Bed pool length')
 
             let countReqAlms = async () => {
@@ -264,15 +304,14 @@ describe("StrongHolderPool", function() {
                     }
                 })
 
-                let pool = await sphMock.pools(0)
-                // let bonusesPaid = await sphMock.bonusesPaid(0)
-                //
-                // console.log('Total bonuses paid: ')
-                // console.log(bonusesPaid[0].toString())
-                // console.log(bonusesPaid[1].toString())
-                // console.log(bonusesPaid[2].toString())
-                // console.log(bonusesPaid[3].toString())
-                // console.log('')
+                let bonusesPaid = await sphMock.bonusesPaid(0)
+
+                console.log('Total bonuses paid: ')
+                console.log(bonusesPaid[0].toString())
+                console.log(bonusesPaid[1].toString())
+                console.log(bonusesPaid[2].toString())
+                console.log(bonusesPaid[3].toString())
+                console.log('')
 
                 // todo: if equal bug
                 console.log((await sphMock.totalLockedPoolTokensFrom(0, 80)).toString())
@@ -362,15 +401,14 @@ describe("StrongHolderPool", function() {
                     }
                 })
 
-                let pool = await sphMock.pools(0)
-                // let bonusesPaid = await sphMock.bonusesPaid(0)
-                //
-                // console.log('Total bonuses paid: ')
-                // console.log(bonusesPaid[0].toString())
-                // console.log(bonusesPaid[1].toString())
-                // console.log(bonusesPaid[2].toString())
-                // console.log(bonusesPaid[3].toString())
-                // console.log('')
+                let bonusesPaid = await sphMock.bonusesPaid(0)
+
+                console.log('Total bonuses paid: ')
+                console.log(bonusesPaid[0].toString())
+                console.log(bonusesPaid[1].toString())
+                console.log(bonusesPaid[2].toString())
+                console.log(bonusesPaid[3].toString())
+                console.log('')
 
                 // todo: if equal bug
                 console.log((await sphMock.totalLockedPoolTokensFrom(0, 80)).toString())
@@ -378,7 +416,6 @@ describe("StrongHolderPool", function() {
                 console.log((await sphMock.totalLockedPoolTokensFrom(0, 90)).toString())
                 console.log((await sphMock.totalLockedPoolTokensFrom(0, 95)).toString())
                 console.log('')
-
 
                 if (100 === i) {
                     await expectRevert(sphMock.getPoolWithdrawPosition(0), "Pool is empty")
@@ -390,37 +427,6 @@ describe("StrongHolderPool", function() {
             }
 
             await withdrawOrder(1)
-
-                // await sphMock.withdraw(0)
-                // let res = await sphMock.withdrawTo(0, await sphMock.getAddress(i+1))
-                //
-                // let events = (await res.wait()).events
-                // // console.log(events[1])
-                // console.log(`Withdrawn: ${i}`)
-                // console.log(events[1].args[0].toString())
-                // console.log(events[1].args[1].toString())
-                //
-                // assert.equal((await sphMock.getPoolWithdrawPosition(0)).toString(), 100 - (i+1), 'Position not changed')
-
-            // // await sphMock.withdraw(0)
-            // let res = await sphMock.withdrawTo(0, await sphMock.getAddress(1))
-            //
-            // let events = (await res.wait()).events
-            // console.log(events[1])
-            // console.log(events[1].args[0].toString())
-            // console.log(events[1].args[1].toString())
-            //
-            // assert.equal((await sphMock.getPoolWithdrawPosition(0)).toString(), 99, 'Position not changed')
-            //
-            // // await sphMock.withdraw(0)
-            // res = await sphMock.withdrawTo(0, await sphMock.getAddress(1))
-            //
-            // events = (await res.wait()).events
-            // console.log(events[1])
-            // console.log(events[1].args[0].toString())
-            // console.log(events[1].args[1].toString())
-            //
-            // assert.equal((await sphMock.getPoolWithdrawPosition(0)).toString(), 98, 'Position not changed')
         })
     })
 
