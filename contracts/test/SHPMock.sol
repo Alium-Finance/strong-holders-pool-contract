@@ -13,13 +13,24 @@ import "../StrongHolderPool.sol";
 
 contract SHPMock is StrongHolderPool {
 
+    struct LockBatchInput {
+        address account;
+        uint256 amount;
+    }
+
     constructor(address _aliumToken) StrongHolderPool(_aliumToken) {
         for (uint i = 1; i <= 100; i++) {
-            _lock(address(uint160(i)), i * 100_000);
+            _lock(address(uint160(i)), 100_000);
         }
     }
 
-    function getAddress(uint256 _num) external pure returns (address) {
+    function lockBatch(LockBatchInput[] memory _input) external {
+        for (uint i = 1; i <= 100; i++) {
+            _lock(_input[i].account, _input[i].amount);
+        }
+    }
+
+    function getAddress(uint256 _num) public pure returns (address) {
         return address(uint160(_num));
     }
 
