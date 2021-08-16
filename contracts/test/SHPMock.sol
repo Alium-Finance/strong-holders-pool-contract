@@ -23,10 +23,6 @@ contract SHPMock is StrongHolderPool {
         return address(uint160(_num));
     }
 
-    function trustedLock(address _to, uint256 _amount) external override(StrongHolderPool) {
-        _lock(_to, _amount);
-    }
-
     function withdrawTo(uint256 _poolId, address _to) external {
         _withdraw(_poolId, _to);
     }

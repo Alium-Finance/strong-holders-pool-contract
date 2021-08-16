@@ -115,10 +115,6 @@ describe("StrongHolderPool", function() {
             assert.equal((await sphMock.poolWithheld(1)).toString(), 0)
         })
 
-        it('#trustedLock', async () => {
-            //
-        })
-
         it('#totalLockedPoolTokensFrom', async () => {
             const SHPMock = await ethers.getContractFactory("SHPMock");
             const sphMock = await SHPMock.deploy(alm.address);
@@ -210,14 +206,7 @@ describe("StrongHolderPool", function() {
                 let result: number = 0;
                 for (let i = 0; i < 100; i++) {
                     // result += (i+1) * 100_000
-
-                    // if (i == 55) {
-                    //     result += 100_000_000
-                    //     //await sphMock.trustedLock(await sphMock.getAddress(i), 100_000_000);
-                    // } else {
-                        result += 100_000
-                        //await sphMock.trustedLock(await sphMock.getAddress(i), 100_000);
-                    // }
+                    result += 100_000
                 }
                 return result;
             }
@@ -437,7 +426,6 @@ describe("StrongHolderPool", function() {
 
     describe('mutable functions, fail tests', () => {
         it('#lock', async () => {})
-        it('#trustedLock', async () => {})
         it('#withdraw', async () => {})
     })
 

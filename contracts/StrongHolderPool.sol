@@ -30,7 +30,6 @@ contract StrongHolderPool is IStrongHolder, Ownable {
     }
 
     address public rewardToken;
-    address public trusted;
 
     uint public constant MAX_POOL_LENGTH = 100;
 
@@ -58,12 +57,6 @@ contract StrongHolderPool is IStrongHolder, Ownable {
             address(this),
             _amount
         );
-        _lock(_to, _amount);
-    }
-
-    // used only for trusted caller,
-    // before call this function, tokens amount MUST be transferred to contract
-    function trustedLock(address _to, uint256 _amount) external virtual override onlyTrusted {
         _lock(_to, _amount);
     }
 
@@ -326,17 +319,4 @@ contract StrongHolderPool is IStrongHolder, Ownable {
             return _balance;
         }
     }
-
-    function setTrustedContract(address _trusted) external onlyOwner {
-        trusted = _trusted;
-    }
-
-    modifier onlyTrusted() {
-        require(
-            msg.sender == trusted,
-            "only trusted caller"
-        );
-        _;
-    }
-
 }
