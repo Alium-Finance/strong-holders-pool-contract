@@ -1,9 +1,8 @@
-import BN from "bn.js";
 import chai from "chai";
 
 import { ethers } from "hardhat";
 import { Signer } from "ethers";
-import { assert, expect } from "chai";
+import { assert } from "chai";
 import { solidity } from "ethereum-waffle";
 
 const {
@@ -14,10 +13,6 @@ const { constants } = ethers;
 const { MaxUint256 } = constants;
 
 chai.use(solidity);
-
-function getDateNow() {
-    return Math.floor(Date.now()/1000);
-}
 
 describe("StrongHolderPool", function() {
     let accounts: Signer[];
@@ -104,10 +99,6 @@ describe("StrongHolderPool", function() {
     })
 
     describe('mutable functions, success tests', () => {
-        before('mut tests', async () => {
-            //
-        })
-
         it('#lock', async () => {
             await farm.connect(ALICE_SIGNER).deposit(0, 100_000)
 
@@ -234,7 +225,7 @@ describe("StrongHolderPool", function() {
             assert.isAbove(Number(totalLocked), Number(totalLockedFrom), 'Locked from not less then total locked')
         })
 
-        it.only('#withdraw', async () => {
+        it('#withdraw', async () => {
             const SHPMock = await ethers.getContractFactory("SHPMock");
             const sphMock = await SHPMock.deploy(alm.address);
 
@@ -245,17 +236,13 @@ describe("StrongHolderPool", function() {
             let countReqAlms = async () => {
                 let result: number = 0;
                 for (let i = 0; i < 100; i++) {
-                    // result += (i+1) * 100_000
                     result += 100_000
                 }
                 return result;
             }
 
             const mintAmount = await countReqAlms();
-            // console.log(mintAmount)
-
             await alm.mint(sphMock.address, mintAmount.toString())
-            // console.log(await sphMock.getAddress(1))
 
             assert.equal((await alm.balanceOf(sphMock.address)).toString(), (await sphMock.totalLockedPoolTokens(0)).toString(), "Bed locked tokens")
 
@@ -265,10 +252,6 @@ describe("StrongHolderPool", function() {
                 }
 
                 const poolId = 0;
-
-                // await sphMock.withdraw(0)
-                // let pool_length = await sphMock.currentPoolLength()
-                // assert.equal(pool_length, 100, "Pool length broken")
 
                 let res = await sphMock.withdrawTo(poolId, await sphMock.getAddress(i))
                 let events = (await res.wait()).events
@@ -333,17 +316,13 @@ describe("StrongHolderPool", function() {
             let countReqAlms = () => {
                 let result: number = 0;
                 for (let i = 0; i < 100; i++) {
-                    // result += (i+1) * 100_000
                     result += 100_000
                 }
                 return result;
             }
 
             const mintAmount = countReqAlms();
-            // console.log(mintAmount)
-
             await alm.mint(sphMock.address, mintAmount.toString())
-            // console.log(await sphMock.getAddress(1))
 
             assert.equal((await alm.balanceOf(sphMock.address)).toString(), (await sphMock.totalLockedPoolTokens(0)).toString(), "Bed locked tokens")
 
@@ -353,10 +332,6 @@ describe("StrongHolderPool", function() {
                 }
 
                 const poolId = 0;
-
-                // await sphMock.withdraw(0)
-                // let pool_length = await sphMock.currentPoolLength()
-                // assert.equal(pool_length, 100, "Pool length broken")
 
                 let res = await sphMock.withdrawTo(poolId, await sphMock.getAddress(i))
                 let events = (await res.wait()).events
@@ -422,8 +397,45 @@ describe("StrongHolderPool", function() {
     })
 
     describe('mutable functions, fail tests', () => {
-        it('#lock', async () => {})
-        it('#withdraw', async () => {})
+        it('#lock', async () => {
+            const SHPMock = await ethers.getContractFactory("SHPMock");
+            const sphMock = await SHPMock.deploy(alm.address);
+
+            assert.equal((await sphMock.totalLockedPoolTokens(0)).toString(), 0)
+
+            const MIN_DEPOSIT = 100_000
+
+            // lock with less balance
+            expectRevert(
+                sphMock.connect(ALICE_SIGNER).lock(ALICE, MIN_DEPOSIT-1),
+                "Not enough for participate"
+            )
+
+            // lock without approve
+            expectRevert(
+                sphMock.connect(ALICE_SIGNER).lock(ALICE, MIN_DEPOSIT),
+                "ERC20: transfer amount exceeds balance"
+            )
+        })
+
+        it('#withdraw', async () => {
+            const SHPMock = await ethers.getContractFactory("SHPMock");
+            const sphMock = await SHPMock.deploy(alm.address);
+
+            expectRevert(
+                sphMock.connect(ALICE_SIGNER).withdraw(0),
+                "Only whole pool"
+            )
+
+            // make pool-0 whole
+            await sphMock.connect(ALICE_SIGNER).fastLock()
+
+            // call from not participant account
+            expectRevert(
+                sphMock.connect(ALICE_SIGNER).withdraw(0),
+                "User not found"
+            )
+        })
     })
 
 });
