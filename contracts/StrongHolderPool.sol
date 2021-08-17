@@ -7,10 +7,11 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 import "./IStrongHolder.sol";
 
-contract StrongHolderPool is IStrongHolder, Ownable {
+contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -48,7 +49,7 @@ contract StrongHolderPool is IStrongHolder, Ownable {
         rewardToken = _aliumToken;
     }
 
-    function lock(address _to, uint256 _amount) external virtual override {
+    function lock(address _to, uint256 _amount) external virtual override nonReentrant {
         require(_to != address(0), "Lock for zero address");
         require(_amount >= 100_000, "Not enough for participate");
 
@@ -60,7 +61,7 @@ contract StrongHolderPool is IStrongHolder, Ownable {
         _lock(_to, _amount);
     }
 
-    function withdraw(uint256 _poolId) external override {
+    function withdraw(uint256 _poolId) external override nonReentrant {
         _withdraw(_poolId, msg.sender);
     }
 
