@@ -143,18 +143,25 @@ contract StrongHolderPool is IStrongHolder, Ownable {
     }
 
     function totalLockedPoolTokens(uint256 _poolId) public view returns (uint256 amount) {
-        uint l = pools[_poolId].users.length;
+        Pool storage pool = pools[_poolId];
+        uint l = pool.users.length;
         for (uint i; i < l; i++) {
-            amount += pools[_poolId].users[i].balance;
+            amount += pool.users[i].balance;
         }
     }
 
     function totalLockedPoolTokensFrom(uint256 _poolId, uint _leftPosition) public view returns (uint256 amount) {
         Pool storage pool = pools[_poolId];
-//        require(pool.leftTracker >= _leftPosition, "Left position not exist, uncountable");
+        if (pool.leftTracker < _leftPosition) {
+            return 0;
+        }
+
         uint l = pool.users.length;
         for (uint i = 0; i < l; i++) {
-            if (!pool.users[i].paid || pool.users[i].leftId >= _leftPosition) {
+            if (pool.users[i].leftId >= _leftPosition && pool.users[i].paid) {
+                amount += pool.users[i].balance;
+            }
+            if (!pool.users[i].paid) {
                 amount += pool.users[i].balance;
             }
         }
@@ -187,7 +194,7 @@ contract StrongHolderPool is IStrongHolder, Ownable {
                 account: _to,
                 balance: _amount,
                 paid: false,
-                leftId: 0
+                leftId: 1
             }));
         } else {
             for (uint i; i < l; i++) {
@@ -199,7 +206,7 @@ contract StrongHolderPool is IStrongHolder, Ownable {
                         account: _to,
                         balance: _amount,
                         paid: false,
-                        leftId: 0
+                        leftId: l + 1
                     }));
                 } else
                     if (pool.users[i].account == _to) {
@@ -230,12 +237,9 @@ contract StrongHolderPool is IStrongHolder, Ownable {
     }
 
     function _countBonuses(uint _poolId, uint _position, uint _balance) internal returns (uint bonus) {
-        emit Test2(_balance, _balance.mul(percentFrom(20, pools[_poolId].withheldFunds)), totalLockedPoolTokensFrom(_poolId, 80+1));
-        return 0;
         if (_position <= 20 && _position > 15) {
             // 80-85
             uint256 totalTokensBonus = totalLockedPoolTokensFrom(_poolId, 80+1);
-//            emit Test2(_balance, percentFrom(20, pools[_poolId].withheldFunds), totalTokensBonus);
             bonus = _balance
                 .mul(percentFrom(20, pools[_poolId].withheldFunds))
                 .div(totalTokensBonus, "cbon 1");
@@ -244,7 +248,12 @@ contract StrongHolderPool is IStrongHolder, Ownable {
             // 85-90
             uint256 totalTokensBonus = totalLockedPoolTokensFrom(_poolId, 85+1);
             bonus = _balance
-            .mul(percentFrom(40, pools[_poolId].withheldFunds - pools[_poolId].bonusesPaid[0]))
+            .mul(percentFrom(40,
+                pools[_poolId].withheldFunds.sub(
+                    pools[_poolId].bonusesPaid[0],
+                    "cbon sub 1"
+                )
+            ))
             .div(totalTokensBonus, "cbon 1");
         } else
         if (_position <= 10 && _position > 5) {
@@ -252,9 +261,11 @@ contract StrongHolderPool is IStrongHolder, Ownable {
             uint256 totalTokensBonus = totalLockedPoolTokensFrom(_poolId, 90+1);
             bonus = _balance
             .mul(percentFrom(60,
-                pools[_poolId].withheldFunds -
-                pools[_poolId].bonusesPaid[0] -
-                pools[_poolId].bonusesPaid[1]
+                pools[_poolId].withheldFunds.sub(
+                    pools[_poolId].bonusesPaid[0] +
+                    pools[_poolId].bonusesPaid[1],
+                    "cbon sub 2"
+                )
             ))
             .div(totalTokensBonus, "cbon 1");
         } else
@@ -273,10 +284,12 @@ contract StrongHolderPool is IStrongHolder, Ownable {
             uint256 totalTokensBonus = totalLockedPoolTokensFrom(_poolId, 95+1);
             bonus = _balance
             .mul(
-                pools[_poolId].withheldFunds -
-                pools[_poolId].bonusesPaid[0] -
-                pools[_poolId].bonusesPaid[1] -
-                pools[_poolId].bonusesPaid[2]
+                pools[_poolId].withheldFunds.sub(
+                    pools[_poolId].bonusesPaid[0] +
+                    pools[_poolId].bonusesPaid[1] +
+                    pools[_poolId].bonusesPaid[2],
+                    "cbon sub 3"
+                )
             )
             .div(totalTokensBonus, "cbon 1");
         }

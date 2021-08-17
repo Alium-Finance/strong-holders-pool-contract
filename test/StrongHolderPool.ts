@@ -234,7 +234,7 @@ describe("StrongHolderPool", function() {
             assert.isAbove(Number(totalLocked), Number(totalLockedFrom), 'Locked from not less then total locked')
         })
 
-        it('#withdraw', async () => {
+        it.only('#withdraw', async () => {
             const SHPMock = await ethers.getContractFactory("SHPMock");
             const sphMock = await SHPMock.deploy(alm.address);
 
@@ -304,22 +304,13 @@ describe("StrongHolderPool", function() {
                     }
                 })
 
-                let bonusesPaid = await sphMock.bonusesPaid(0)
-
-                console.log('Total bonuses paid: ')
-                console.log(bonusesPaid[0].toString())
-                console.log(bonusesPaid[1].toString())
-                console.log(bonusesPaid[2].toString())
-                console.log(bonusesPaid[3].toString())
-                console.log('')
-
                 // todo: if equal bug
-                console.log((await sphMock.totalLockedPoolTokensFrom(0, 80)).toString())
-                console.log((await sphMock.totalLockedPoolTokensFrom(0, 85)).toString())
-                console.log((await sphMock.totalLockedPoolTokensFrom(0, 90)).toString())
-                console.log((await sphMock.totalLockedPoolTokensFrom(0, 95)).toString())
+                console.log('Locked pool tokens in range [0...4]')
+                console.log((await sphMock.totalLockedPoolTokensFrom(0, 81)).toString())
+                console.log((await sphMock.totalLockedPoolTokensFrom(0, 86)).toString())
+                console.log((await sphMock.totalLockedPoolTokensFrom(0, 91)).toString())
+                console.log((await sphMock.totalLockedPoolTokensFrom(0, 96)).toString())
                 console.log('')
-
 
                 if (100 === i) {
                     await expectRevert(sphMock.getPoolWithdrawPosition(0), "Pool is empty")
