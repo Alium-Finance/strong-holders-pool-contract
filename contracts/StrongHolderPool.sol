@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-import "./IStrongHolder.sol";
+import "./interfaces/IStrongHolder.sol";
 import "./interfaces/INFTRewardPool.sol";
 
 contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
