@@ -76,7 +76,7 @@ contract NFTRewardPool is INFTRewardPool, Ownable, IERC1155Receiver, ERC1155Hold
                     ) {
                         //
                     } catch (bytes memory error) {
-                        _balances[msg.sender][reward.amount] += reward.amount;
+                        _balances[msg.sender][reward.tokenId] += reward.amount;
                     }
                 }
             }
