@@ -9,7 +9,8 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-import "./IStrongHolder.sol";
+import "./interfaces/IStrongHolder.sol";
+import "./interfaces/INFTRewardPool.sol";
 
 contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
     using SafeMath for uint256;
@@ -31,6 +32,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
     }
 
     address public rewardToken;
+    address public nftRewardPool;
 
     uint public constant MAX_POOL_LENGTH = 100;
 
@@ -168,6 +170,10 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         }
     }
 
+    function setNftRewardPool(address _rewardPool) external onlyOwner {
+        nftRewardPool = _rewardPool;
+    }
+
     function _countAndWithdraw(uint _poolId, uint _position, address _account, uint _balance) internal {
         uint amount = _countReward(_poolId, _position, _balance);
         uint bonus = _countBonuses(_poolId, _position, _balance);
@@ -177,6 +183,9 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
             emit Bonus(_account, bonus);
         }
         IERC20(rewardToken).safeTransfer(_account, amount);
+        if (nftRewardPool != address(0)) {
+            INFTRewardPool(nftRewardPool).log(_account, _position);
+        }
         emit Withdrawn(_account, amount);
     }
 
