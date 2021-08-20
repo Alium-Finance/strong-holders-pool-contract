@@ -24,14 +24,19 @@ contract NFTRewardPool is INFTRewardPool, Ownable, IERC1155Receiver, ERC1155Hold
     IAliumGaming1155 public rewardToken;
     address public shp;
 
+    bool public initialized;
+
     mapping (uint256 => Reward[]) internal _rewards;
     // pool id -> withdraw position -> counter
     mapping (address => mapping (uint256 => uint256)) internal _logs;
     mapping (address => mapping (uint256 => uint256)) internal _balances;
 
     event Logged(address, uint);
+    event Initialized();
+    event RewardUpdated(uint poolId);
 
     function initialize(IAliumGaming1155 _rewardToken, address _shp) external onlyOwner {
+        require(!initialized, "Reward pool: initialized");
         require(
             address(_rewardToken) != address(0), 
             "Reward zero address"
@@ -43,6 +48,8 @@ contract NFTRewardPool is INFTRewardPool, Ownable, IERC1155Receiver, ERC1155Hold
 
         rewardToken = _rewardToken;
         shp = _shp;
+        initialized = true;
+        emit Initialized();
     }
 
     function log(address _caller, uint256 _withdrawPosition) external override onlySHP {
@@ -50,7 +57,6 @@ contract NFTRewardPool is INFTRewardPool, Ownable, IERC1155Receiver, ERC1155Hold
         emit Logged(_caller, _withdrawPosition);
     }
 
-    // todo: check data clear
     function claim() external {
         Reward memory reward;
         uint256[101] memory _userLogs = getLogs(msg.sender);
@@ -101,12 +107,11 @@ contract NFTRewardPool is INFTRewardPool, Ownable, IERC1155Receiver, ERC1155Hold
         rewardToken.safeTransferFrom(address(this), _to, _tokenId, balance, "");
     }
 
-    function getBalance(address _account, uint _position) external view returns (uint256) {
-        return _balances[_account][_position];
+    function getBalance(address _account, uint _tokenId) external view returns (uint256) {
+        return _balances[_account][_tokenId];
     }
 
-    // call contract
-    function getLog(address _account, uint _withdrawPosition) public view returns (uint256 res) {
+    function getLog(address _account, uint _withdrawPosition) external view returns (uint256 res) {
         res = _logs[_account][_withdrawPosition];
     }
 
@@ -126,16 +131,28 @@ contract NFTRewardPool is INFTRewardPool, Ownable, IERC1155Receiver, ERC1155Hold
     function setReward(
         uint256 _position,
         Reward[] memory _rewardsList
-    ) external onlyOwner {
+    )
+        external
+        onlyOwner
+    {
         uint l = _rewardsList.length;
         uint i = 0;
         delete _rewards[_position];
         for (i; i < l; i++) {
             _rewards[_position].push(_rewardsList[i]);
         }
+
+        emit RewardUpdated(_position);
     }
 
-    function setRewards(uint256[] memory _positions, InputReward[] memory _rewardsLists) external onlyOwner {
+    // @notice Reward will be overwritten
+    function setRewards(
+        uint256[] memory _positions,
+        InputReward[] memory _rewardsLists
+    )
+        external
+        onlyOwner
+    {
         uint l = _positions.length;
 
         require(l == _rewardsLists.length, "Incorrect length input data");
@@ -158,6 +175,8 @@ contract NFTRewardPool is INFTRewardPool, Ownable, IERC1155Receiver, ERC1155Hold
             for (uint ii; ii < ll; ii++) {
                 _rewards[_positions[i]].push(_rewardsLists[i].rewards[ii]);
             }
+
+            emit RewardUpdated(_positions[i]);
         }
     }
 
