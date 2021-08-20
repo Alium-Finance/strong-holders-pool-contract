@@ -8,6 +8,9 @@ import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "./interfaces/IAliumGaming1155.sol";
 import "./interfaces/INFTRewardPool.sol";
 
+/**
+ * @title NFTRewardPool - Special NFT reward pool for SHP alium users and gamers.
+ */
 contract NFTRewardPool is INFTRewardPool, Ownable, IERC1155Receiver, ERC1155Holder {
 
     struct Reward {
@@ -29,12 +32,18 @@ contract NFTRewardPool is INFTRewardPool, Ownable, IERC1155Receiver, ERC1155Hold
     mapping (uint256 => Reward[]) internal _rewards;
     // pool id -> withdraw position -> counter
     mapping (address => mapping (uint256 => uint256)) internal _logs;
+    // account -> tokenId -> amount
     mapping (address => mapping (uint256 => uint256)) internal _balances;
 
     event Logged(address, uint);
     event Initialized();
     event RewardUpdated(uint poolId);
 
+    /**
+     * @dev Initialize contract.
+     *
+     * Permission: Owner
+     */
     function initialize(IAliumGaming1155 _rewardToken, address _shp) external onlyOwner {
         require(!initialized, "Reward pool: initialized");
         require(
@@ -52,11 +61,19 @@ contract NFTRewardPool is INFTRewardPool, Ownable, IERC1155Receiver, ERC1155Hold
         emit Initialized();
     }
 
+    /**
+     * @dev Write to log `_caller` and `_withdrawPosition`.
+     *
+     * Permission: SHP
+     */
     function log(address _caller, uint256 _withdrawPosition) external override onlySHP {
         _logs[_caller][_withdrawPosition] += 1;
         emit Logged(_caller, _withdrawPosition);
     }
 
+    /**
+     * @dev Claim available reward.
+     */
     function claim() external {
         Reward memory reward;
         uint256[101] memory _userLogs = getLogs(msg.sender);
@@ -89,10 +106,16 @@ contract NFTRewardPool is INFTRewardPool, Ownable, IERC1155Receiver, ERC1155Hold
         }
     }
 
+    /**
+     * @dev Withdraw available tokens by `_tokenId`.
+     */
     function withdraw(uint256 _tokenId) external {
         _withdraw(msg.sender, msg.sender, _tokenId, _balances[msg.sender][_tokenId]);
     }
 
+    /**
+     * @dev Withdraw to account `_to` amount `_tokenAmount` tokens with `_tokenId`.
+     */
     function withdrawTo(address _to, uint256 _tokenId, uint256 _tokenAmount) external {
         _withdraw(msg.sender, _to, _tokenId, _tokenAmount);
     }
@@ -107,14 +130,23 @@ contract NFTRewardPool is INFTRewardPool, Ownable, IERC1155Receiver, ERC1155Hold
         rewardToken.safeTransferFrom(address(this), _to, _tokenId, balance, "");
     }
 
+    /**
+     * @dev Returns `_account` balance by `_tokenId`.
+     */
     function getBalance(address _account, uint _tokenId) external view returns (uint256) {
         return _balances[_account][_tokenId];
     }
 
+    /**
+     * @dev Returns `_account` log by `_withdrawPosition`.
+     */
     function getLog(address _account, uint _withdrawPosition) external view returns (uint256 res) {
         res = _logs[_account][_withdrawPosition];
     }
 
+    /**
+     * @dev Returns `_account` logs.
+     */
     function getLogs(address _account) public view returns (uint256[101] memory res) {
         uint l = 100;
         uint i = 1;
@@ -123,11 +155,20 @@ contract NFTRewardPool is INFTRewardPool, Ownable, IERC1155Receiver, ERC1155Hold
         }
     }
 
+    /**
+     * @dev Returns reward by `_withdrawPosition`.
+     */
     function getReward(uint256 _withdrawPosition) external view returns (Reward[] memory) {
         return _rewards[_withdrawPosition];
     }
 
-    // @notice Reward will be overwritten
+    /**
+     * @dev Set `_rewardsList` for current `_withdrawPosition`.
+     *
+     * Permission: owner
+     *
+     * @notice Reward will be overwritten
+     */
     function setReward(
         uint256 _position,
         Reward[] memory _rewardsList
@@ -145,7 +186,13 @@ contract NFTRewardPool is INFTRewardPool, Ownable, IERC1155Receiver, ERC1155Hold
         emit RewardUpdated(_position);
     }
 
-    // @notice Reward will be overwritten
+    /**
+     * @dev Set `_rewardsLists` for selected `_positions`.
+     *
+     * Permission: owner
+     *
+     * @notice Reward will be overwritten
+     */
     function setRewards(
         uint256[] memory _positions,
         InputReward[] memory _rewardsLists
