@@ -11,10 +11,19 @@
     "@types/chai": "^4.2.15",
     "@types/mocha": "^9.0.0",
     "chai": "^4.3.4",
+    "eslint": "^7.3.1",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.4.1",
     "hardhat": "^2.5.0",
     "mocha": "^9.0.3",
+    "prettier": "^2.2.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.5",
+    "solhint": "^3.3.6",
     "ts-node": "^10.1.0",
     "typescript": "^4.3.5"
   },
@@ -25,6 +34,10 @@
   "scripts": {
     "build": "npx hardhat compile",
     "dev": "npx hardhat node",
-    "test": "npx hardhat test"
+    "test": "npx hardhat test",
+    "lint": "solhint 'contracts/**/*.sol' --ignore-path .solhintignore",
+    "prettier": "npx prettier --write 'contracts/**/*.sol'",
+    "lint:js": "eslint .",
+    "lint:js:fix": "eslint . --fix"
   }
 }

@@ -1,0 +1,28 @@
+{
+  "extends": "solhint:recommended",
+  "plugins": [],
+  "rules": {
+    "const-name-snakecase": "warn",
+    "max-line-length": [
+      "warn",
+      80
+    ],
+    "avoid-suicide": "error",
+    "avoid-sha3": "warn",
+    "func-order": "off",
+    "mark-callable-contracts": "off",
+    "no-empty-blocks": "off",
+    "compiler-version": "off",
+    "private-vars-leading-underscore": "error",
+    "reason-string": "off",
+    "func-visibility": [
+      "error", {
+        "ignoreConstructors": true
+      }
+    ],
+    "quotes": [
+      "error",
+      "double"
+    ]
+  }
+}
