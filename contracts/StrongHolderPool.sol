@@ -230,9 +230,6 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         }
     }
 
-    event Test(uint, uint);
-    event Test2(uint, uint, uint);
-
     function poolWithheld(uint _poolId) public view returns (uint) {
         return pools[_poolId].withheldFunds;
     }
@@ -240,35 +237,35 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
     function _countBonuses(uint _poolId, uint _position, uint _balance) internal returns (uint bonus) {
         if (_position <= 20 && _position > 15) {
             // 80-85
-            uint256 totalTokensBonus = totalLockedPoolTokensFrom(_poolId, 80+1);
+            uint256 totalTokensBonus = totalLockedPoolTokensFrom(_poolId, 81);
             bonus = _balance
                 .mul(percentFrom(20, pools[_poolId].withheldFunds))
-                .div(totalTokensBonus, "cbon 1");
+                .div(totalTokensBonus);
         } else
         if (_position <= 15 && _position > 10) {
             // 85-90
-            uint256 totalTokensBonus = totalLockedPoolTokensFrom(_poolId, 85+1);
+            uint256 totalTokensBonus = totalLockedPoolTokensFrom(_poolId, 86);
             bonus = _balance
-            .mul(percentFrom(40,
-                pools[_poolId].withheldFunds.sub(
-                    pools[_poolId].bonusesPaid[0],
-                    "cbon sub 1"
-                )
-            ))
-            .div(totalTokensBonus, "cbon 1");
+                .mul(percentFrom(
+                    40,
+                    pools[_poolId].withheldFunds.sub(
+                        pools[_poolId].bonusesPaid[0]
+                    )
+                ))
+                .div(totalTokensBonus);
         } else
         if (_position <= 10 && _position > 5) {
             // 90-95
-            uint256 totalTokensBonus = totalLockedPoolTokensFrom(_poolId, 90+1);
+            uint256 totalTokensBonus = totalLockedPoolTokensFrom(_poolId, 91);
             bonus = _balance
-            .mul(percentFrom(60,
-                pools[_poolId].withheldFunds.sub(
-                    pools[_poolId].bonusesPaid[0] +
-                    pools[_poolId].bonusesPaid[1],
-                    "cbon sub 2"
-                )
-            ))
-            .div(totalTokensBonus, "cbon 1");
+                .mul(percentFrom(
+                    60,
+                    pools[_poolId].withheldFunds.sub(
+                        pools[_poolId].bonusesPaid[0] +
+                        pools[_poolId].bonusesPaid[1]
+                    )
+                ))
+                .div(totalTokensBonus);
         } else
         if (_position <= 5 && _position > 0) {
             // 100
@@ -277,59 +274,53 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
                     pools[_poolId].bonusesPaid[0] +
                     pools[_poolId].bonusesPaid[1] +
                     pools[_poolId].bonusesPaid[2] +
-                    pools[_poolId].bonusesPaid[3],
-                    "sub last"
+                    pools[_poolId].bonusesPaid[3]
                 );
             }
             // 95-99
-            uint256 totalTokensBonus = totalLockedPoolTokensFrom(_poolId, 95+1);
+            uint256 totalTokensBonus = totalLockedPoolTokensFrom(_poolId, 96);
             bonus = _balance
-            .mul(
-                pools[_poolId].withheldFunds.sub(
-                    pools[_poolId].bonusesPaid[0] +
-                    pools[_poolId].bonusesPaid[1] +
-                    pools[_poolId].bonusesPaid[2],
-                    "cbon sub 3"
+                .mul(
+                    pools[_poolId].withheldFunds.sub(
+                        pools[_poolId].bonusesPaid[0] +
+                        pools[_poolId].bonusesPaid[1] +
+                        pools[_poolId].bonusesPaid[2]
+                    )
                 )
-            )
-            .div(totalTokensBonus, "cbon 1");
+                .div(totalTokensBonus);
         }
     }
 
     function _findMinCountReward(uint _poolId, uint _balance, uint _percent) private returns (uint256 reward) {
         uint _totalTokens = totalLockedPoolTokens(_poolId);
-        //        emit Test(_totalTokens, _balance);
-//        return 1;
         uint deposited = percentFrom(_percent, _balance);
-        uint poolLeft = percentFrom(_percent, _totalTokens.sub(_balance, "fmcr 1"));
+        uint poolLeft = percentFrom(_percent, _totalTokens.sub(_balance));
         if (poolLeft < deposited) {
-            reward = _balance.sub(poolLeft, "fmcr 2");
+            reward = _balance.sub(poolLeft);
             pools[_poolId].withheldFunds += poolLeft;
             emit Withheld(poolLeft);
         } else {
-            reward = _balance.sub(deposited, "fmcr 3");
+            reward = _balance.sub(deposited);
             pools[_poolId].withheldFunds += deposited;
             emit Withheld(deposited);
         }
     }
 
-    function _countReward(uint _poolId, uint _position, uint _balance) internal returns (uint256 reward) {
-        //uint totalTokens = totalLockedPoolTokens(_poolId);
-
-        //70%
-        if (_position <= 100 && _position > 100-35) {
+    function _countReward(uint _poolId, uint _position, uint _balance) internal returns (uint256) {
+        // k-70% (100 - 100-35)
+        if (_position <= 100 && _position > 65) {
             return _findMinCountReward(_poolId, _balance, 70);
         } else
-        //50%
-        if (_position <= 100-35 && _position > 100-55) {
+        // k-50% (100-35 - 100-55)
+        if (_position <= 65 && _position > 45) {
             return _findMinCountReward(_poolId, _balance, 50);
         } else
-        //25%
-        if (_position <= 100-55 && _position > 100-70) {
+        // k-25% (100-55 - 100-70)
+        if (_position <= 45 && _position > 30) {
             return _findMinCountReward(_poolId, _balance, 25);
         } else
-        // 0%
-        if (_position <= 100-70 && _position >= 0) {
+        // k-0% (100-70 - 0)
+        if (_position <= 30 && _position >= 0) {
             return _balance;
         }
     }
