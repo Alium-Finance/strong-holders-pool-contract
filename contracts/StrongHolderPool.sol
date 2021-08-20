@@ -12,6 +12,15 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./interfaces/IStrongHolder.sol";
 import "./interfaces/INFTRewardPool.sol";
 
+/**
+ * @title StrongHolderPool - Alium token pools. Who is strongest?
+ *
+ *   Features:
+ *
+ *   - 100 places in 1 pool;
+ *   - Honest redistribution;
+ *   - NFT reward on side NFT pool contract.
+ */
 contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
@@ -45,12 +54,19 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
     event Withdrawn(address account, uint256 amount);
     event Withheld(uint amount);
 
+    /**
+     * @dev Constructor. Set `_aliumToken` as reward token.
+     */
     constructor(address _aliumToken) {
         require(_aliumToken != address(0), "Reward token set zero address");
 
         rewardToken = _aliumToken;
     }
 
+    /**
+      * @dev Lock `_amount` for address `_to`. It create new position or update current,
+      *     if already exist.
+     */
     function lock(address _to, uint256 _amount) external virtual override nonReentrant {
         require(_to != address(0), "Lock for zero address");
         require(_amount >= 100_000, "Not enough for participate");
@@ -63,6 +79,9 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         _lock(_to, _amount);
     }
 
+    /**
+       * @dev Withdraw reward from contract, left position will be counted automatically.
+      */
     function withdraw(uint256 _poolId) external override nonReentrant {
         _withdraw(_poolId, msg.sender);
     }
@@ -96,12 +115,20 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         revert("User not found");
     }
 
+    /**
+     * @dev Count `_percent` from `_num`.
+     */
     function percentFrom(uint _percent, uint _num) public pure returns (uint256 result) {
         require(_percent != 0 && _percent <= 100, "percent from: wrong _percent");
 
         result = _num.mul(_percent).div(100);
     }
 
+    /**
+     * @dev Get pool withdraw position for next withdraw.
+     *
+     * REVERT: if pool is empty or not filled.
+     */
     function getPoolWithdrawPosition(uint256 _poolId)
         external
         view
@@ -123,18 +150,30 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         return uint256(100).sub(pool.leftTracker);
     }
 
+    /**
+     * @dev Get current pool length.
+     */
     function currentPoolLength() public view returns (uint256) {
         return pools[Counters.current(_poolIndex)].users.length;
     }
 
+    /**
+     * @dev Get current pool id.
+     */
     function getCurrentPoolId() public view returns (uint256) {
         return Counters.current(_poolIndex);
     }
 
+    /**
+     * @dev Get pool length by `_poolId`.
+     */
     function poolLength(uint _poolId) public view returns (uint256) {
         return pools[_poolId].users.length;
     }
 
+    /**
+     * @dev Get `_account` locked tokens by `_poolId`.
+     */
     function userLockedPoolTokens(uint256 _poolId, address _account) public view returns (uint256) {
         Pool storage pool = pools[_poolId];
         uint l = pool.users.length;
@@ -145,6 +184,9 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         }
     }
 
+    /**
+     * @dev Get total locked tokens by `_poolId`.
+     */
     function totalLockedPoolTokens(uint256 _poolId) public view returns (uint256 amount) {
         Pool storage pool = pools[_poolId];
         uint l = pool.users.length;
@@ -153,7 +195,15 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         }
     }
 
-    function totalLockedPoolTokensFrom(uint256 _poolId, uint _leftPosition) public view returns (uint256 amount) {
+    /**
+     * @dev Get total locked tokens from `_leftPosition` by `_poolId`.
+     *      If left position not exist returns zero.
+     */
+    function totalLockedPoolTokensFrom(uint256 _poolId, uint _leftPosition)
+        public
+        view
+        returns (uint256 amount)
+    {
         Pool storage pool = pools[_poolId];
         if (pool.leftTracker < _leftPosition) {
             return 0;
@@ -170,11 +220,22 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         }
     }
 
+    /**
+     * @dev Get total locked tokens from `_leftPosition` by `_poolId`.
+     *      If left position not exist returns zero.
+     */
     function setNftRewardPool(address _rewardPool) external onlyOwner {
         nftRewardPool = _rewardPool;
     }
 
-    function _countAndWithdraw(uint _poolId, uint _position, address _account, uint _balance) internal {
+    function _countAndWithdraw(
+        uint _poolId,
+        uint _position,
+        address _account,
+        uint _balance
+    )
+        internal
+    {
         uint amount = _countReward(_poolId, _position, _balance);
         uint bonus = _countBonuses(_poolId, _position, _balance);
         if (bonus > 0) {
@@ -239,11 +300,17 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         }
     }
 
+    /**
+     * @dev Returns pool withheld by `_poolId`.
+     */
     function poolWithheld(uint _poolId) public view returns (uint) {
         return pools[_poolId].withheldFunds;
     }
 
-    function _countBonuses(uint _poolId, uint _position, uint _balance) internal returns (uint bonus) {
+    function _countBonuses(uint _poolId, uint _position, uint _balance)
+        internal
+        returns (uint bonus)
+    {
         if (_position <= 20 && _position > 15) {
             // 80-85
             uint256 totalTokensBonus = totalLockedPoolTokensFrom(_poolId, 81);
@@ -300,7 +367,14 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         }
     }
 
-    function _findMinCountReward(uint _poolId, uint _balance, uint _percent) private returns (uint256 reward) {
+    function _findMinCountReward(
+        uint _poolId,
+        uint _balance,
+        uint _percent
+    )
+        private
+        returns (uint256 reward)
+    {
         uint _totalTokens = totalLockedPoolTokens(_poolId);
         uint deposited = percentFrom(_percent, _balance);
         uint poolLeft = percentFrom(_percent, _totalTokens.sub(_balance));
@@ -315,7 +389,14 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         }
     }
 
-    function _countReward(uint _poolId, uint _position, uint _balance) internal returns (uint256) {
+    function _countReward(
+        uint _poolId,
+        uint _position,
+        uint _balance
+    )
+        internal
+        returns (uint256)
+    {
         // k-70% (100 - 100-35)
         if (_position <= 100 && _position > 65) {
             return _findMinCountReward(_poolId, _balance, 70);
