@@ -120,16 +120,6 @@ contract NFTRewardPool is INFTRewardPool, Ownable, IERC1155Receiver, ERC1155Hold
         _withdraw(msg.sender, _to, _tokenId, _tokenAmount);
     }
 
-    function _withdraw(address _from, address _to, uint256 _tokenId, uint256 _tokenAmount) private {
-        uint balance = _balances[_from][_tokenId];
-
-        require(balance > 0, "Withdraw empty balance");
-        require(_tokenAmount >= balance, "Not enough token balance");
-
-        _balances[_from][_tokenId] -= _tokenAmount;
-        rewardToken.safeTransferFrom(address(this), _to, _tokenId, balance, "");
-    }
-
     /**
      * @dev Returns `_account` balance by `_tokenId`.
      */
@@ -142,17 +132,6 @@ contract NFTRewardPool is INFTRewardPool, Ownable, IERC1155Receiver, ERC1155Hold
      */
     function getLog(address _account, uint _withdrawPosition) external view returns (uint256 res) {
         res = _logs[_account][_withdrawPosition];
-    }
-
-    /**
-     * @dev Returns `_account` logs.
-     */
-    function getLogs(address _account) public view returns (uint256[101] memory res) {
-        uint l = 100;
-        uint i = 1;
-        for (i; i <= l; i++) {
-            res[i] = _logs[_account][i];
-        }
     }
 
     /**
@@ -225,6 +204,27 @@ contract NFTRewardPool is INFTRewardPool, Ownable, IERC1155Receiver, ERC1155Hold
 
             emit RewardUpdated(_positions[i]);
         }
+    }
+
+    /**
+     * @dev Returns `_account` logs.
+     */
+    function getLogs(address _account) public view returns (uint256[101] memory res) {
+        uint l = 100;
+        uint i = 1;
+        for (i; i <= l; i++) {
+            res[i] = _logs[_account][i];
+        }
+    }
+
+    function _withdraw(address _from, address _to, uint256 _tokenId, uint256 _tokenAmount) private {
+        uint balance = _balances[_from][_tokenId];
+
+        require(balance > 0, "Withdraw empty balance");
+        require(_tokenAmount >= balance, "Not enough token balance");
+
+        _balances[_from][_tokenId] -= _tokenAmount;
+        rewardToken.safeTransferFrom(address(this), _to, _tokenId, balance, "");
     }
 
     modifier onlySHP {

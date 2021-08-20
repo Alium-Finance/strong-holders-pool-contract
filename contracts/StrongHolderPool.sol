@@ -107,7 +107,12 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
                 pool.users[i].paid = true;
                 pool.position[position] = i;
                 pool.leftTracker++;
-                _countAndWithdraw(_poolId, position, pool.users[i].account, pool.users[i].balance);
+                _countAndWithdraw(
+                    _poolId,
+                    position,
+                    pool.users[i].account,
+                    pool.users[i].balance
+                );
                 return;
             }
         }
@@ -153,28 +158,25 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
     /**
      * @dev Get current pool length.
      */
-    function currentPoolLength() public view returns (uint256) {
+    function currentPoolLength() external view returns (uint256) {
         return pools[Counters.current(_poolIndex)].users.length;
     }
 
     /**
      * @dev Get current pool id.
      */
-    function getCurrentPoolId() public view returns (uint256) {
+    function getCurrentPoolId() external view returns (uint256) {
         return Counters.current(_poolIndex);
-    }
-
-    /**
-     * @dev Get pool length by `_poolId`.
-     */
-    function poolLength(uint _poolId) public view returns (uint256) {
-        return pools[_poolId].users.length;
     }
 
     /**
      * @dev Get `_account` locked tokens by `_poolId`.
      */
-    function userLockedPoolTokens(uint256 _poolId, address _account) public view returns (uint256) {
+    function userLockedPoolTokens(uint256 _poolId, address _account)
+        external
+        view
+        returns (uint256)
+    {
         Pool storage pool = pools[_poolId];
         uint l = pool.users.length;
         for (uint i; i < l; i++) {
@@ -182,6 +184,28 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
                 return pool.users[i].balance;
             }
         }
+    }
+
+    /**
+     * @dev Returns pool withheld by `_poolId`.
+     */
+    function poolWithheld(uint _poolId) external view returns (uint) {
+        return pools[_poolId].withheldFunds;
+    }
+
+    /**
+     * @dev Get total locked tokens from `_leftPosition` by `_poolId`.
+     *      If left position not exist returns zero.
+     */
+    function setNftRewardPool(address _rewardPool) external onlyOwner {
+        nftRewardPool = _rewardPool;
+    }
+
+    /**
+     * @dev Get pool length by `_poolId`.
+     */
+    function poolLength(uint _poolId) public view returns (uint256) {
+        return pools[_poolId].users.length;
     }
 
     /**
@@ -218,14 +242,6 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
                 amount += pool.users[i].balance;
             }
         }
-    }
-
-    /**
-     * @dev Get total locked tokens from `_leftPosition` by `_poolId`.
-     *      If left position not exist returns zero.
-     */
-    function setNftRewardPool(address _rewardPool) external onlyOwner {
-        nftRewardPool = _rewardPool;
     }
 
     function _countAndWithdraw(
@@ -298,13 +314,6 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         } else if (_position <= 100-95 && _position > 100-100) {
             pools[_poolId].bonusesPaid[3] += _bonus;
         }
-    }
-
-    /**
-     * @dev Returns pool withheld by `_poolId`.
-     */
-    function poolWithheld(uint _poolId) public view returns (uint) {
-        return pools[_poolId].withheldFunds;
     }
 
     function _countBonuses(uint _poolId, uint _position, uint _balance)
