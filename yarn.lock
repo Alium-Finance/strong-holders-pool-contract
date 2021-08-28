@@ -749,6 +749,11 @@
     web3 "^1.2.5"
     web3-utils "^1.2.5"
 
+"@rarible/royalties@^0.7.2":
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/@rarible/royalties/-/royalties-0.7.2.tgz#690af58c5266c42ccfd122415636840e748bf017"
+  integrity sha512-0SeG2Rq8x6q/NTkBnxFSvKKpF/iNGuc8UbIYgFyFPq9ve7NJjP4gK8OeijxOonk8gABT/vJPw9KH6Qs9pl/vuw==
+
 "@resolver-engine/core@^0.3.3":
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/@resolver-engine/core/-/core-0.3.3.tgz#590f77d85d45bc7ecc4e06c654f41345db6ca967"

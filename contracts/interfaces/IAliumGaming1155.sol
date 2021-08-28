@@ -11,4 +11,21 @@ interface IAliumGaming1155 is IERC1155 {
         uint256 tokenAmount,
         bytes memory data
     ) external;
+
+    function burn(
+        uint256 tokenId,
+        uint256 tokenAmount
+    ) external;
+
+    function mintBatch(
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    ) external;
+
+    function burnBatch(
+        uint256[] memory ids,
+        uint256[] memory amounts
+    ) external;
 }
