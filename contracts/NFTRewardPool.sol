@@ -41,6 +41,7 @@ contract NFTRewardPool is
     mapping(address => mapping(uint256 => uint256)) internal _balances;
 
     event Logged(address, uint256);
+    event ErrorLog(bytes);
     event Initialized();
     event RewardUpdated(uint256 poolId);
 
@@ -120,6 +121,7 @@ contract NFTRewardPool is
                         //
                     } catch (bytes memory error) {
                         _balances[msg.sender][reward.tokenId] += reward.amount;
+                        emit ErrorLog(error);
                     }
                 }
             }
