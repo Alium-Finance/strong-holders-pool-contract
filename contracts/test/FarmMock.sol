@@ -17,7 +17,7 @@ contract FarmMock {
     constructor(
         address _rewardToken,
         address _shp
-    ) public {
+    ) {
         rewardToken = _rewardToken;
         shp = _shp;
 

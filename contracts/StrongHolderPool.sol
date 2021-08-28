@@ -321,7 +321,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         uint256 _poolId,
         uint256 _position,
         uint256 _balance
-    ) internal returns (uint256 bonus) {
+    ) internal view returns (uint256 bonus) {
         if (_position <= 20 && _position > 15) {
             // 80-85
             uint256 totalTokensBonus = totalLockedPoolTokensFrom(_poolId, 81);
