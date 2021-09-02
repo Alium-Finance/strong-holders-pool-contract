@@ -7,21 +7,22 @@ import "../interfaces/IAliumGaming1155.sol";
 import "./AccessControlToken.sol";
 import "./RoyaltyToken.sol";
 
-contract AliumGaming1155 is IAliumGaming1155, ERC1155, AccessControlToken, RoyaltyToken {
+contract AliumGaming1155 is
+    IAliumGaming1155,
+    ERC1155,
+    AccessControlToken,
+    RoyaltyToken
+{
     constructor(string memory _tokenUrl) ERC1155(_tokenUrl) {
         //
     }
 
     function mint(
         address _to,
-        uint _tokenId,
-        uint _tokenAmount,
+        uint256 _tokenId,
+        uint256 _tokenAmount,
         bytes memory _data
-    )
-        external
-        override
-        onlyRole(MINTER_ROLE)
-    {
+    ) external override onlyRole(MINTER_ROLE) {
         _mint(_to, _tokenId, _tokenAmount, _data);
     }
 
@@ -30,28 +31,15 @@ contract AliumGaming1155 is IAliumGaming1155, ERC1155, AccessControlToken, Royal
         uint256[] memory _ids,
         uint256[] memory _amounts,
         bytes memory _data
-    )
-        external
-        override
-        onlyRole(MINTER_ROLE)
-    {
+    ) external override onlyRole(MINTER_ROLE) {
         _mintBatch(_to, _ids, _amounts, _data);
     }
 
-    function burn(
-        uint _tokenId,
-        uint _tokenAmount
-    )
-        external
-        override
-    {
+    function burn(uint256 _tokenId, uint256 _tokenAmount) external override {
         _burn(_msgSender(), _tokenId, _tokenAmount);
     }
 
-    function burnBatch(
-        uint256[] memory _ids,
-        uint256[] memory _amounts
-    )
+    function burnBatch(uint256[] memory _ids, uint256[] memory _amounts)
         external
         override
     {
@@ -65,7 +53,8 @@ contract AliumGaming1155 is IAliumGaming1155, ERC1155, AccessControlToken, Royal
         override(RoyaltyToken, AccessControlEnumerable, ERC1155, IERC165)
         returns (bool)
     {
-        return _interfaceId == type(IAliumGaming1155).interfaceId ||
+        return
+            _interfaceId == type(IAliumGaming1155).interfaceId ||
             ERC1155.supportsInterface(_interfaceId) ||
             AccessControlEnumerable.supportsInterface(_interfaceId) ||
             RoyaltyToken.supportsInterface(_interfaceId);

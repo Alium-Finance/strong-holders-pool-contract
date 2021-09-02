@@ -6,29 +6,43 @@ import "./AbstractRoyalties.sol";
 import "../RoyaltiesV1.sol";
 
 contract RoyaltiesV1Impl is AbstractRoyalties, RoyaltiesV1 {
-
-    function getFeeRecipients(uint256 id) public override view returns (address payable[] memory) {
+    function getFeeRecipients(uint256 id)
+        public
+        view
+        override
+        returns (address payable[] memory)
+    {
         LibPart.Part[] memory _royalties = _royalties[id];
-        address payable[] memory result = new address payable[](_royalties.length);
-        for (uint i = 0; i < _royalties.length; i++) {
+        address payable[] memory result = new address payable[](
+            _royalties.length
+        );
+        for (uint256 i = 0; i < _royalties.length; i++) {
             result[i] = payable(_royalties[i].account);
         }
         return result;
     }
 
-    function getFeeBps(uint256 id) public override view returns (uint[] memory) {
+    function getFeeBps(uint256 id)
+        public
+        view
+        override
+        returns (uint256[] memory)
+    {
         LibPart.Part[] memory _royalties = _royalties[id];
-        uint[] memory result = new uint[](_royalties.length);
-        for (uint i = 0; i < _royalties.length; i++) {
+        uint256[] memory result = new uint256[](_royalties.length);
+        for (uint256 i = 0; i < _royalties.length; i++) {
             result[i] = _royalties[i].value;
         }
         return result;
     }
 
-    function _onRoyaltiesSet(uint256 id, LibPart.Part[] memory _royalties) override internal {
+    function _onRoyaltiesSet(uint256 id, LibPart.Part[] memory _royalties)
+        internal
+        override
+    {
         address[] memory recipients = new address[](_royalties.length);
-        uint[] memory bps = new uint[](_royalties.length);
-        for (uint i = 0; i < _royalties.length; i++) {
+        uint256[] memory bps = new uint256[](_royalties.length);
+        for (uint256 i = 0; i < _royalties.length; i++) {
             recipients[i] = _royalties[i].account;
             bps[i] = _royalties[i].value;
         }

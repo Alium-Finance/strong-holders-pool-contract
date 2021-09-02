@@ -47,5 +47,4 @@ contract AccessControlToken is AccessControlEnumerable {
 
         super.renounceRole(_role, _msgSender());
     }
-
 }

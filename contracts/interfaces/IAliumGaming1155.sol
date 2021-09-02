@@ -12,10 +12,7 @@ interface IAliumGaming1155 is IERC1155 {
         bytes memory data
     ) external;
 
-    function burn(
-        uint256 tokenId,
-        uint256 tokenAmount
-    ) external;
+    function burn(uint256 tokenId, uint256 tokenAmount) external;
 
     function mintBatch(
         address to,
@@ -24,8 +21,5 @@ interface IAliumGaming1155 is IERC1155 {
         bytes memory data
     ) external;
 
-    function burnBatch(
-        uint256[] memory ids,
-        uint256[] memory amounts
-    ) external;
+    function burnBatch(uint256[] memory ids, uint256[] memory amounts) external;
 }

@@ -215,11 +215,8 @@ contract NFTRewardPool is
     function setRewards(
         uint256[] memory _positions,
         InputReward[] memory _rewardsLists
-    )
-        external
-        onlyOwner
-    {
-        uint l = _positions.length;
+    ) external onlyOwner {
+        uint256 l = _positions.length;
 
         require(l == _rewardsLists.length, "Incorrect length input data");
 
