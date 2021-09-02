@@ -8,7 +8,7 @@ import "../RoyaltiesV1.sol";
 contract RoyaltiesV1Impl is AbstractRoyalties, RoyaltiesV1 {
 
     function getFeeRecipients(uint256 id) public override view returns (address payable[] memory) {
-        LibPart.Part[] memory _royalties = royalties[id];
+        LibPart.Part[] memory _royalties = _royalties[id];
         address payable[] memory result = new address payable[](_royalties.length);
         for (uint i = 0; i < _royalties.length; i++) {
             result[i] = payable(_royalties[i].account);
@@ -17,7 +17,7 @@ contract RoyaltiesV1Impl is AbstractRoyalties, RoyaltiesV1 {
     }
 
     function getFeeBps(uint256 id) public override view returns (uint[] memory) {
-        LibPart.Part[] memory _royalties = royalties[id];
+        LibPart.Part[] memory _royalties = _royalties[id];
         uint[] memory result = new uint[](_royalties.length);
         for (uint i = 0; i < _royalties.length; i++) {
             result[i] = _royalties[i].value;

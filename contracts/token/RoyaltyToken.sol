@@ -36,7 +36,7 @@ contract RoyaltyToken is RoyaltiesV1Impl, AccessControlToken, ERC165Storage {
     }
 
     function getRoyalties(uint _tokenId) external view returns (LibPart.Part[] memory) {
-        return royalties[_tokenId];
+        return _royalties[_tokenId];
     }
 
     function supportsInterface(bytes4 _interfaceId) public view virtual override(AccessControlEnumerable, ERC165Storage) returns (bool) {
