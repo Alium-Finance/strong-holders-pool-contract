@@ -7,6 +7,8 @@ import { solidity } from "ethereum-waffle";
 
 const {
     expectRevert, // Assertions for transactions that should fail
+
+    // eslint-disable-next-line
 } = require('@openzeppelin/test-helpers');
 
 const { constants } = ethers;
@@ -51,10 +53,6 @@ describe("StrongHolderPool", function() {
         await alm.mint(farm.address, '10000000000000000000')
     })
 
-    describe('setters', () => {
-        it('#setTrustedContract', async () => {})
-    })
-
     describe('getters', () => {
         it('#percentFrom', async () => {
             assert.equal(await shp.percentFrom(10, 100), 10)
@@ -73,7 +71,7 @@ describe("StrongHolderPool", function() {
             assert.equal((await sphMock.getPoolWithdrawPosition(0)).toString(), 100)
 
             for (let i = 0; i < 100; i++) {
-                let address = await sphMock.getAddress(i+1);
+                const address = await sphMock.getAddress(i+1);
                 await sphMock.withdrawTo(0, address)
                 if (i == 100-1) {
                     expectRevert(sphMock.getPoolWithdrawPosition(0), "Pool is empty");
@@ -95,7 +93,6 @@ describe("StrongHolderPool", function() {
 
             assert.equal((await sphMock.totalLockedPoolTokens(0)).toString(), 100_000)
         })
-        it('#totalLockedPoolTokensFrom', async () => {})
     })
 
     describe('mutable functions, success tests', () => {
@@ -150,8 +147,8 @@ describe("StrongHolderPool", function() {
 
             assert.equal(await sphMock.poolLength(0), 100, 'Bed pool length')
 
-            let countReqAlms = async () => {
-                let result: number = 0;
+            const countReqAlms = async () => {
+                let result = 0;
                 for (let i = 0; i < 100; i++) {
                     result += 100_000
                 }
@@ -168,8 +165,8 @@ describe("StrongHolderPool", function() {
             )
 
             const poolId = 0;
-            let res = await sphMock.withdrawTo(poolId, await sphMock.getAddress(1))
-            let events = (await res.wait()).events
+            const res = await sphMock.withdrawTo(poolId, await sphMock.getAddress(1))
+            const events = (await res.wait()).events
 
             console.log('Withheld: ')
             console.log((await sphMock.poolWithheld(poolId)).toString())
@@ -233,8 +230,8 @@ describe("StrongHolderPool", function() {
 
             assert.equal(await sphMock.poolLength(0), 100, 'Bed pool length')
 
-            let countReqAlms = async () => {
-                let result: number = 0;
+            const countReqAlms = async () => {
+                let result = 0;
                 for (let i = 0; i < 100; i++) {
                     result += 100_000
                 }
@@ -246,15 +243,15 @@ describe("StrongHolderPool", function() {
 
             assert.equal((await alm.balanceOf(sphMock.address)).toString(), (await sphMock.totalLockedPoolTokens(0)).toString(), "Bed locked tokens")
 
-            let withdrawOrder = async (i: number) => {
+            const withdrawOrder = async (i: number) => {
                 if (i > 100) {
                     return;
                 }
 
                 const poolId = 0;
 
-                let res = await sphMock.withdrawTo(poolId, await sphMock.getAddress(i))
-                let events = (await res.wait()).events
+                const res = await sphMock.withdrawTo(poolId, await sphMock.getAddress(i))
+                const events = (await res.wait()).events
 
                 console.log('Withheld: ')
                 console.log((await sphMock.poolWithheld(poolId)).toString())
@@ -313,8 +310,8 @@ describe("StrongHolderPool", function() {
 
             assert.equal(await sphMock.poolLength(0), 100, 'Bed pool length')
 
-            let countReqAlms = () => {
-                let result: number = 0;
+            const countReqAlms = () => {
+                let result = 0;
                 for (let i = 0; i < 100; i++) {
                     result += 100_000
                 }
@@ -326,15 +323,15 @@ describe("StrongHolderPool", function() {
 
             assert.equal((await alm.balanceOf(sphMock.address)).toString(), (await sphMock.totalLockedPoolTokens(0)).toString(), "Bed locked tokens")
 
-            let withdrawOrder = async (i: number) => {
+            const withdrawOrder = async (i: number) => {
                 if (i > 100) {
                     return;
                 }
 
                 const poolId = 0;
 
-                let res = await sphMock.withdrawTo(poolId, await sphMock.getAddress(i))
-                let events = (await res.wait()).events
+                const res = await sphMock.withdrawTo(poolId, await sphMock.getAddress(i))
+                const events = (await res.wait()).events
 
                 console.log('Withheld: ')
                 console.log((await sphMock.poolWithheld(poolId)).toString())
@@ -367,7 +364,7 @@ describe("StrongHolderPool", function() {
                     }
                 })
 
-                let bonusesPaid = await sphMock.bonusesPaid(0)
+                const bonusesPaid = await sphMock.bonusesPaid(0)
 
                 console.log('Total bonuses paid: ')
                 console.log(bonusesPaid[0].toString())

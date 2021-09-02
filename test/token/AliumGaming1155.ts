@@ -4,11 +4,6 @@ import { ethers } from "hardhat";
 import { Signer } from "ethers";
 import { assert } from "chai";
 import { solidity } from "ethereum-waffle";
-
-const {
-    expectRevert, // Assertions for transactions that should fail
-} = require('@openzeppelin/test-helpers');
-
 const { constants } = ethers;
 const { MaxUint256 } = constants;
 

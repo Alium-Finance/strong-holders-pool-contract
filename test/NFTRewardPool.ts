@@ -5,13 +5,6 @@ import { Signer } from "ethers";
 import { assert } from "chai";
 import { solidity } from "ethereum-waffle";
 
-const {
-    expectRevert, // Assertions for transactions that should fail
-} = require('@openzeppelin/test-helpers');
-
-const { constants } = ethers;
-const { MaxUint256 } = constants;
-
 chai.use(solidity);
 
 describe("NFTRewardPool", function() {
@@ -172,12 +165,12 @@ describe("NFTRewardPool", function() {
                     amount: 100
                 }])
 
-                let rewardPool = await nftPool.getReward(1)
+                const rewardPool = await nftPool.getReward(1)
 
                 assert.equal(rewardPool[0].tokenId.toString(), 1)
                 assert.equal(rewardPool[0].amount.toString(), 100)
 
-                let prevAliceBalance: number = Number(await almGaming1155.balanceOf(ALICE, 1))
+                const prevAliceBalance = Number(await almGaming1155.balanceOf(ALICE, 1))
 
                 await nftPool.connect(ALICE_SIGNER).claim()
 
