@@ -10,6 +10,20 @@
         "bracketSpacing": false,
         "explicitTypes": "always"
       }
+    },
+    {
+      "parser": "@typescript-eslint/parser",
+      "plugins": [
+        "prettier"
+      ],
+      "files": "*.ts",
+      "options": {
+        "semi": true,
+        "trailingComma": "all",
+        "singleQuote": false,
+        "printWidth": 120,
+        "tabWidth": 4
+      }
     }
   ]
 }
