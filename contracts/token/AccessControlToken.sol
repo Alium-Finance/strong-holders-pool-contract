@@ -9,7 +9,9 @@ contract AccessControlToken is AccessControlEnumerable {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     constructor() {
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, msg.sender);
+        _setRoleAdmin(ADMIN_ROLE, DEFAULT_ADMIN_ROLE);
     }
 
     /**
