@@ -36,6 +36,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         User[] users;
         uint256 leftTracker;
         uint256 withheldFunds;
+        uint256 createdAt;
         uint256[4] bonusesPaid;
         mapping(uint256 => uint256) position;
     }
@@ -209,6 +210,13 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
     }
 
     /**
+     * @dev Get users list by `_poolId`.
+     */
+    function users(uint256 _poolId) public view returns (User[] memory _users) {
+        _users = pools[_poolId].users;
+    }
+
+    /**
      * @dev Get total locked tokens by `_poolId`.
      */
     function totalLockedPoolTokens(uint256 _poolId)
@@ -282,6 +290,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
             pool.users.push(
                 User({account: _to, balance: _amount, paid: false, leftId: 1})
             );
+            pool.createdAt = block.timestamp;
         } else {
             for (uint256 i; i < l; i++) {
                 if (pool.users[i].account != _to && l - 1 == i) {
