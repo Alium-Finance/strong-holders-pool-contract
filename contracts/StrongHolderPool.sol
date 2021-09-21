@@ -52,7 +52,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
     mapping(uint256 => Pool) public pools;
 
     event Bonus(address, uint256);
-    event Withdrawn(address account, uint256 amount);
+    event Withdrawn(uint256 poolId, address account, uint256 amount);
     event Withheld(uint256 amount);
 
     /**
@@ -275,7 +275,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         if (nftRewardPool != address(0)) {
             INFTRewardPool(nftRewardPool).log(_account, _position);
         }
-        emit Withdrawn(_account, amount);
+        emit Withdrawn(_poolId, _account, amount);
     }
 
     function _lock(address _to, uint256 _amount) internal {
