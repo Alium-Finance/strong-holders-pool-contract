@@ -52,7 +52,8 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
     mapping(uint256 => Pool) public pools;
 
     event Bonus(address, uint256);
-    event Withdrawn(uint256 poolId, address account, uint256 amount);
+    event Deposited(uint256 indexed poolId,address account, uint256 amount);
+    event Withdrawn(uint256 indexed poolId, address account, uint256 amount);
     event Withheld(uint256 amount);
 
     /**
@@ -312,6 +313,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
                 }
             }
         }
+        emit Deposited(_poolId, _to, _amount);
     }
 
     function _payBonus(
