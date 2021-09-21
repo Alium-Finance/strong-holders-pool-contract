@@ -92,36 +92,6 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         _withdraw(_poolId, msg.sender);
     }
 
-    function _withdraw(uint256 _poolId, address _to) internal {
-        require(poolLength(_poolId) == 100, "Only whole pool");
-
-        Pool storage pool = pools[_poolId];
-
-        require(pool.leftTracker <= 100, "Pool is empty");
-
-        uint256 position = uint256(100).sub(pool.leftTracker);
-
-        uint256 l = 100;
-        for (uint256 i; i < l; i++) {
-            if (pool.users[i].account == _to) {
-                require(!pool.users[i].paid, "Reward already received");
-
-                pool.users[i].paid = true;
-                pool.position[position] = i;
-                pool.leftTracker++;
-                _countAndWithdraw(
-                    _poolId,
-                    position,
-                    pool.users[i].account,
-                    pool.users[i].balance
-                );
-                return;
-            }
-        }
-
-        revert("User not found");
-    }
-
     /**
      * @dev Count `_percent` from `_num`.
      */
@@ -461,5 +431,35 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         else if (_position <= 30 && _position >= 0) {
             reward = _balance;
         }
+    }
+
+    function _withdraw(uint256 _poolId, address _to) internal {
+        require(poolLength(_poolId) == 100, "Only whole pool");
+
+        Pool storage pool = pools[_poolId];
+
+        require(pool.leftTracker <= 100, "Pool is empty");
+
+        uint256 position = uint256(100).sub(pool.leftTracker);
+
+        uint256 l = 100;
+        for (uint256 i; i < l; i++) {
+            if (pool.users[i].account == _to) {
+                require(!pool.users[i].paid, "Reward already received");
+
+                pool.users[i].paid = true;
+                pool.position[position] = i;
+                pool.leftTracker++;
+                _countAndWithdraw(
+                    _poolId,
+                    position,
+                    pool.users[i].account,
+                    pool.users[i].balance
+                );
+                return;
+            }
+        }
+
+        revert("User not found");
     }
 }
