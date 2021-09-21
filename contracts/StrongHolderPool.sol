@@ -104,6 +104,8 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         uint256 l = 100;
         for (uint256 i; i < l; i++) {
             if (pool.users[i].account == _to) {
+                require(!pool.users[i].paid, "Reward already received");
+
                 pool.users[i].paid = true;
                 pool.position[position] = i;
                 pool.leftTracker++;
