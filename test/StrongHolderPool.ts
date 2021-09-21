@@ -451,6 +451,11 @@ describe("StrongHolderPool", function () {
 
             // call from not participant account
             expectRevert(sphMock.connect(ALICE_SIGNER).withdraw(0), "User not found");
+
+            await alm.connect(OWNER_SIGNER).mint(sphMock.address, 100000);
+            await sphMock.connect(ALICE_SIGNER).withdrawTo(0, "0x0000000000000000000000000000000000000001");
+
+            expectRevert(sphMock.connect(ALICE_SIGNER).withdrawTo(0, "0x0000000000000000000000000000000000000001"), "Reward already received");
         });
     });
 });
