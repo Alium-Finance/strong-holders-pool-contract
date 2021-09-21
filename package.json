@@ -45,6 +45,7 @@
     "prettier": "npx prettier --write 'contracts/**/*.sol'",
     "prettier:js": "npx prettier --write 'test/**/*.ts'",
     "lint:js": "eslint . --ext .ts",
-    "lint:js-fix": "eslint . --ext .ts --fix"
+    "lint:js-fix": "eslint . --ext .ts --fix",
+    "dist": "npx waffle flatten"
   }
 }
