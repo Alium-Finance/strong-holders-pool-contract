@@ -2,6 +2,9 @@ import { task } from "hardhat/config";
 
 import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-solhint";
+import "@nomiclabs/hardhat-etherscan";
+
+const config = require("./config.json");
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -28,8 +31,20 @@ module.exports = {
     hardhat: {
     },
     bscTestnet: {
-      url: "https://eth-mainnet.alchemyapi.io/v2/123abc123abc123abc123abc123abcde",
-      // accounts: [privateKey1, privateKey2, ...]
+      // 97: [
+      //   'https://data-seed-prebsc-1-s1.binance.org:8545',
+      //   'https://data-seed-prebsc-2-s1.binance.org:8545',
+      //   'https://data-seed-prebsc-1-s2.binance.org:8545',
+      //   'https://data-seed-prebsc-2-s2.binance.org:8545',
+      //   'https://data-seed-prebsc-1-s3.binance.org:8545',
+      //   'https://data-seed-prebsc-2-s3.binance.org:8545',
+      // ]
+      url: "https://data-seed-prebsc-1-s1.binance.org:8545",
+      accounts: [config.privateKey]
+    },
+    bscMainnet: {
+      url: "https://bsc-dataseed.binance.org/",
+      accounts: [config.privateKey]
     }
   },
   solidity: {
@@ -49,6 +64,9 @@ module.exports = {
   },
   mocha: {
     timeout: 90000
+  },
+  etherscan: {
+    apiKey: config.bscscanApiKey
   }
 };
 
