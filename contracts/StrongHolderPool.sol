@@ -283,10 +283,6 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
 
     function _lock(address _to, uint256 _amount) internal {
         uint256 _poolId = Counters.current(_poolIndex);
-        if (pools[_poolId].users.length == 100) {
-            Counters.increment(_poolIndex);
-            _poolId = Counters.current(_poolIndex);
-        }
 
         Pool storage pool = pools[_poolId];
 
@@ -307,6 +303,10 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
                             leftId: l + 1
                         })
                     );
+
+                    if (pools[_poolId].users.length == 100) {
+                        Counters.increment(_poolIndex);
+                    }
                 } else if (pool.users[i].account == _to) {
                     pool.users[i].balance += _amount;
                     return;

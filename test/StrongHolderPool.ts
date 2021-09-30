@@ -136,6 +136,7 @@ describe("StrongHolderPool", function () {
             await sphMock.fastLock();
 
             assert.equal(await sphMock.poolLength(0), 100, "Bed pool length");
+            assert.equal(Number(await sphMock.getCurrentPoolId()), 1, "Wrong pool id not incremented");
 
             await alm.mint(ALICE, 100_000);
 
@@ -157,7 +158,9 @@ describe("StrongHolderPool", function () {
             const SHPMock = await ethers.getContractFactory("SHPMock");
             const sphMock = await SHPMock.deploy(alm.address);
 
-            assert.equal(await sphMock.poolLength(0), 100, "Bed pool length");
+            await sphMock.fastLock();
+
+            assert.equal(Number(await sphMock.poolLength(0)), 100, "Bed pool length");
 
             const countReqAlms = async () => {
                 let result = 0;
@@ -231,7 +234,7 @@ describe("StrongHolderPool", function () {
             console.log(totalLocked);
             console.log(totalLockedFrom);
 
-            assert.isAbove(Number(totalLocked), Number(totalLockedFrom), "Locked from not less then total locked");
+            assert.equal(Number(totalLocked), Number(totalLockedFrom), "not equal");
         });
 
         it("#withdraw", async () => {
@@ -328,7 +331,9 @@ describe("StrongHolderPool", function () {
             const SHPMock = await ethers.getContractFactory("SHPMock");
             const sphMock = await SHPMock.deploy(alm.address);
 
-            assert.equal(await sphMock.poolLength(0), 100, "Bed pool length");
+            await sphMock.fastLock();
+
+            assert.equal(Number(await sphMock.poolLength(0)), 100, "Bed pool length");
 
             const countReqAlms = () => {
                 let result = 0;
@@ -388,14 +393,14 @@ describe("StrongHolderPool", function () {
                     }
                 });
 
-                const bonusesPaid = await sphMock.bonusesPaid(0);
-
-                console.log("Total bonuses paid: ");
-                console.log(bonusesPaid[0].toString());
-                console.log(bonusesPaid[1].toString());
-                console.log(bonusesPaid[2].toString());
-                console.log(bonusesPaid[3].toString());
-                console.log("");
+                // const bonusesPaid = await sphMock.bonusesPaid(0);
+                //
+                // console.log("Total bonuses paid: ");
+                // console.log(bonusesPaid[0].toString());
+                // console.log(bonusesPaid[1].toString());
+                // console.log(bonusesPaid[2].toString());
+                // console.log(bonusesPaid[3].toString());
+                // console.log("");
 
                 // todo: if equal bug
                 console.log((await sphMock.totalLockedPoolTokensFrom(0, 80)).toString());
