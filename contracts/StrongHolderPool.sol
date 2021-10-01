@@ -36,6 +36,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         User[] users;
         uint256 leftTracker;
         uint256 withheldFunds;
+        uint256 withdrawn;
         uint256 createdAt;
         uint256[4] bonusesPaid;
         mapping(uint256 => uint256) position;
@@ -167,7 +168,6 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         return pools[_poolId].withheldFunds;
     }
 
-
     /**
      * @dev Returns current withdraw position reward for `_account` by `_poolId`.
      */
@@ -278,6 +278,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         if (nftRewardPool != address(0)) {
             INFTRewardPool(nftRewardPool).log(_account, _position);
         }
+        pools[_poolId].withdrawn += amount;
         emit Withdrawn(_poolId, _account, amount);
     }
 
