@@ -186,9 +186,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
 
                 uint256 position = uint256(100).sub(pool.leftTracker);
                 (reward, ) = _countReward(_poolId, position, pool.users[i].balance);
-                if (position <= 20) {
-                    reward += _countBonuses(_poolId, position, pool.users[i].balance);
-                }
+                reward += _countBonuses(_poolId, position + 1, pool.users[i].balance);
 
                 return reward;
             }
@@ -343,7 +341,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
             uint256 totalTokensBonus = totalLockedPoolTokensFrom(_poolId, 81);
             bonus = _balance
                 .mul(percentFrom(20, pools[_poolId].withheldFunds))
-                .div(totalTokensBonus);
+                .div(totalTokensBonus, "Total tokens bonus div");
         } else if (_position <= 15 && _position > 10) {
             // 85-90
             uint256 totalTokensBonus = totalLockedPoolTokensFrom(_poolId, 86);

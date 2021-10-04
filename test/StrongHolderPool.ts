@@ -237,7 +237,7 @@ describe("StrongHolderPool", function () {
             assert.equal(Number(totalLocked), Number(totalLockedFrom), "not equal");
         });
 
-        it("#withdraw", async () => {
+        it.only("#withdraw", async () => {
             const SHPMock = await ethers.getContractFactory("SHPMock");
             const sphMock = await SHPMock.deploy(alm.address);
 
@@ -269,7 +269,17 @@ describe("StrongHolderPool", function () {
 
                 const poolId = 0;
 
-                const res = await sphMock.withdrawTo(poolId, await sphMock.getAddress(i));
+                const account = await sphMock.getAddress(i);
+
+                console.log('Expected reward:')
+                console.log((await sphMock.countReward(0, account)).toString())
+                console.log("");
+
+                console.log('total locked pool tokens from:')
+                console.log((await sphMock.totalLockedPoolTokensFrom(0, i)).toString())
+                console.log("");
+
+                const res = await sphMock.withdrawTo(poolId, account);
                 const events = (await res.wait()).events;
 
                 console.log("Withheld: ");
@@ -279,8 +289,9 @@ describe("StrongHolderPool", function () {
                 events.map(({ args, event }: any) => {
                     if (event == "Withdrawn") {
                         console.log(`Withdrawn: ${i}`);
-                        console.log(args[0].toString());
-                        console.log(args[1].toString());
+                        console.log(`poolId: ${args[0].toString()}`);
+                        console.log(`account: ${args[1].toString()}`);
+                        console.log(`amount: ${args[2].toString()}`);
                         console.log("");
                     }
                     if (event == "Withheld") {
