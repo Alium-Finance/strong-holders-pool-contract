@@ -25,20 +25,17 @@ async function main() {
 
         await shp.deployed();
 
-        console.log("StrongHolderPool deployed to:", shp.address);
+        console.log("StrongHolderPool initialized!");
     }
 
     if (hre.network.name === 'bscTestnet') {
-        const AliumToken = "0xfECb47AFD19d96F6bDa5d5883FcA7230beb6fD70"
-        const shp = await StrongHolderPool.deploy(
-            AliumToken
-        );
+        const SHP_ADDRESS = '0x65533E342449dcC24062126A3aa17E670f1B762D'
+        const shp = await StrongHolderPool.attach(SHP_ADDRESS)
 
-        await shp.deployed();
+        const NFTRewardPoolAddress = '0x746a6AfeC89B1FCC56ffdA04682c771d9270d072'
+        await shp.setNftRewardPool(NFTRewardPoolAddress);
 
-        console.log("StrongHolderPool deployed to:", shp.address);
-
-
+        console.log("StrongHolderPool initialized!");
     }
 
 }
