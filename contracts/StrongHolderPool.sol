@@ -53,9 +53,10 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
     mapping(uint256 => Pool) public pools;
 
     event Bonus(address, uint256);
-    event Deposited(uint256 indexed poolId,address account, uint256 amount);
-    event Withdrawn(uint256 indexed poolId, address account, uint256 amount);
+    event Deposited(uint256 indexed poolId, address account, uint256 amount);
+    event Withdrawn(uint256 indexed poolId, uint256 position, address account, uint256 amount);
     event Withheld(uint256 amount);
+    event RewardPoolSet(address rewardPool);
 
     /**
      * @dev Constructor. Set `_aliumToken` as reward token.
@@ -198,6 +199,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
      */
     function setNftRewardPool(address _rewardPool) external onlyOwner {
         nftRewardPool = _rewardPool;
+        emit RewardPoolSet(_rewardPool);
     }
 
     /**
@@ -276,7 +278,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
             INFTRewardPool(nftRewardPool).log(_account, _position);
         }
         pools[_poolId].withdrawn += amount;
-        emit Withdrawn(_poolId, _account, amount);
+        emit Withdrawn(_poolId, _position, _account, amount);
     }
 
     function _lock(address _to, uint256 _amount) internal {
