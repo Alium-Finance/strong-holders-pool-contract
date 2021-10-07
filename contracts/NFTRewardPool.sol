@@ -201,6 +201,8 @@ contract NFTRewardPool is
         uint256 i = 0;
         delete _rewards[_position];
         for (i; i < l; i++) {
+            require(_rewardsList[i].amount != 0, "Zero reward amount");
+
             _rewards[_position].push(_rewardsList[i]);
         }
 
