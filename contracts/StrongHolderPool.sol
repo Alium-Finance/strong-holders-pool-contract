@@ -212,7 +212,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
     /**
      * @dev Get users list by `_poolId`.
      */
-    function users(uint256 _poolId) public view returns (User[] memory _users) {
+    function users(uint256 _poolId) external view returns (User[] memory _users) {
         _users = pools[_poolId].users;
     }
 
