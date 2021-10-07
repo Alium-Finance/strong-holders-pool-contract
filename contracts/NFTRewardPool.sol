@@ -86,6 +86,8 @@ contract NFTRewardPool is
         override
         onlySHP
     {
+        require(_caller != address(0), "Log zero address");
+
         _logs[_caller][_withdrawPosition] += 1;
         emit Logged(_caller, _withdrawPosition);
     }
@@ -264,6 +266,12 @@ contract NFTRewardPool is
         uint256 _tokenId,
         uint256 _tokenAmount
     ) private {
+        require(
+            _from != address(0) &&
+            _to != address(0),
+            "Transfer to or from zero address"
+        );
+
         uint256 balance = _balances[_from][_tokenId];
 
         require(balance > 0, "Withdraw empty balance");
