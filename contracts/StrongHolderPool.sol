@@ -416,7 +416,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         uint256 _poolId,
         uint256 _position,
         uint256 _balance
-    ) internal view returns (uint256 reward, uint withheld) {
+    ) internal view returns (uint256 reward, uint256 withheld) {
         // k-70% (100 - 100-35)
         if (_position <= 100 && _position > 65) {
             (reward, withheld) = _findMinCountReward(_poolId, _balance, 70);
