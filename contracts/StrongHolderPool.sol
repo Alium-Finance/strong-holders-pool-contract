@@ -430,7 +430,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
             (reward, withheld) = _findMinCountReward(_poolId, _balance, 25);
         }
         // k-0% (100-70 - 0)
-        else if (_position <= 30 && _position >= 0) {
+        else if (_position <= 30) {
             reward = _balance;
         }
     }
