@@ -37,7 +37,6 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         uint256 leftTracker;
         uint256 withheldFunds;
         uint256 withdrawn;
-        uint256 createdAt;
         uint256[4] bonusesPaid;
         mapping(uint256 => uint256) position;
     }
@@ -57,6 +56,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
     event Withdrawn(uint256 indexed poolId, uint256 position, address account, uint256 amount);
     event Withheld(uint256 amount);
     event RewardPoolSet(address rewardPool);
+    event PoolCreated(uint256 poolId);
 
     /**
      * @dev Constructor. Set `_aliumToken` as reward token.
@@ -291,7 +291,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
             pool.users.push(
                 User({account: _to, balance: _amount, paid: false, leftId: 0})
             );
-            pool.createdAt = block.timestamp;
+            emit PoolCreated(_poolId);
         } else {
             for (uint256 i; i < l; i++) {
                 if (pool.users[i].account != _to && l - 1 == i) {
