@@ -194,8 +194,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
     }
 
     /**
-     * @dev Get total locked tokens from `_leftPosition` by `_poolId`.
-     *      If left position not exist returns zero.
+     * @dev Set NFT reward pool.
      */
     function setNftRewardPool(address _rewardPool) external onlyOwner {
         nftRewardPool = _rewardPool;
@@ -288,7 +287,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         uint256 l = pool.users.length;
         if (l == 0) {
             pool.users.push(
-                User({account: _to, balance: _amount, paid: false, leftId: 1})
+                User({account: _to, balance: _amount, paid: false, leftId: 0})
             );
             pool.createdAt = block.timestamp;
         } else {
@@ -299,7 +298,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
                             account: _to,
                             balance: _amount,
                             paid: false,
-                            leftId: l + 1
+                            leftId: 0
                         })
                     );
 
@@ -451,6 +450,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
                 pool.users[i].paid = true;
                 pool.position[position] = i;
                 pool.leftTracker++;
+                pool.users[i].leftId = pool.leftTracker;
                 _countAndWithdraw(
                     _poolId,
                     position,
