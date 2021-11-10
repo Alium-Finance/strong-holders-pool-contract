@@ -16,6 +16,28 @@ const { MaxUint256 } = constants;
 
 chai.use(solidity);
 
+function shuffle(array: Array<number>) {
+    let currentIndex = array.length,  randomIndex;
+
+    // While there remain elements to shuffle...
+    while (currentIndex != 0) {
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        // And swap it with the current element.
+        [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+    }
+
+    return array;
+}
+
+function randomIntFromInterval(min: number, max: number) { // min and max included
+    return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
 describe("StrongHolderPool", function () {
     let accounts: Signer[];
 
@@ -237,7 +259,79 @@ describe("StrongHolderPool", function () {
             assert.equal(Number(totalLocked), Number(totalLockedFrom), "not equal");
         });
 
-        it.only("#withdraw", async () => {
+        it("#withdraw with random left", async () => {
+            const SHPMock = await ethers.getContractFactory("SHPMock");
+            const sphMock = await SHPMock.deploy(alm.address);
+
+            let fillNumericArray = (from: number, to: number) => {
+                let result = [];
+                for (let i = from; i <= to; i++) {
+                    result.push(i);
+                }
+                return result;
+            };
+
+            const oneHundredUsers = fillNumericArray(1, 100)
+            const oneHundredUsersSchuffled = shuffle(oneHundredUsers)
+
+            console.log(oneHundredUsersSchuffled)
+
+            const countReqAlms = async () => {
+                let result = 0;
+                for (let i = 0; i < 100; i++) {
+                    let randDeposit = randomIntFromInterval(100_000, 1_000_000_000_000)
+                    result += randDeposit;
+                }
+                return result;
+            };
+
+            const mintAmount = await countReqAlms();
+
+            assert.equal(Number(await sphMock.poolLength(0)), 100, "Bed pool length");
+
+            await alm.mint(sphMock.address, mintAmount.toString());
+
+            assert.equal(
+                (await alm.balanceOf(sphMock.address)).toString(),
+                (await sphMock.totalLockedPoolTokens(0)).toString(),
+                "Bed locked tokens",
+            );
+
+            const withdrawOrder = async (i: number) => {
+                if (i > 100) {
+                    return;
+                }
+
+                const poolId = 0;
+                const accountId = oneHundredUsersSchuffled[i-1];
+                const account = await sphMock.getAddress(accountId);
+
+                console.log('Account address:')
+                console.log(account)
+                console.log("");
+
+                console.log('Expected reward:')
+                console.log((await sphMock.countReward(0, account)).toString())
+                console.log("");
+
+                console.log('total locked pool tokens from:')
+                console.log((await sphMock.totalLockedPoolTokensFrom(0, i)).toString())
+                console.log("");
+
+                const res = await sphMock.withdrawTo(poolId, account);
+                const events = (await res.wait()).events;
+
+                console.log("Withheld: ");
+                console.log((await sphMock.poolWithheld(poolId)).toString());
+                console.log("");
+
+                await withdrawOrder(i + 1);
+            };
+
+            await withdrawOrder(1);
+        });
+
+        it("#withdraw", async () => {
             const SHPMock = await ethers.getContractFactory("SHPMock");
             const sphMock = await SHPMock.deploy(alm.address);
 
