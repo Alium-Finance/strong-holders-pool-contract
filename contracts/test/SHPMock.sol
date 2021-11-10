@@ -22,6 +22,12 @@ contract SHPMock is StrongHolderPool {
         }
     }
 
+    function lockTo(address _to, uint _amount) external {
+        for (uint i = 1; i <= 100; i++) {
+            _lock(_to, _amount);
+        }
+    }
+
     function lockBatch(LockBatchInput[] memory _input) external {
         for (uint i = 0; i < _input.length; i++) {
             _lock(_input[i].account, _input[i].amount);
