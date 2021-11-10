@@ -39,6 +39,7 @@ module.exports = {
       //   'https://data-seed-prebsc-1-s3.binance.org:8545',
       //   'https://data-seed-prebsc-2-s3.binance.org:8545',
       // ]
+      gasLimit: "10000000",
       url: "https://data-seed-prebsc-1-s1.binance.org:8545",
       accounts: [config.privateKey]
     },
@@ -63,7 +64,7 @@ module.exports = {
     artifacts: "./artifacts"
   },
   mocha: {
-    timeout: 90000
+    timeout: 500000
   },
   etherscan: {
     apiKey: config.bscscanApiKey
