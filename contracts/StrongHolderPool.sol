@@ -321,13 +321,13 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         uint256 _position,
         uint256 _bonus
     ) internal {
-        if (_position <= 100 - 80 && _position > 100 - 85) {
+        if (_position <= 20 && _position > 15) {
             pools[_poolId].bonusesPaid[0] += _bonus;
-        } else if (_position <= 100 - 85 && _position > 100 - 90) {
+        } else if (_position <= 15 && _position > 10) {
             pools[_poolId].bonusesPaid[1] += _bonus;
-        } else if (_position <= 100 - 90 && _position > 100 - 95) {
+        } else if (_position <= 10 && _position > 5) {
             pools[_poolId].bonusesPaid[2] += _bonus;
-        } else if (_position <= 100 - 95 && _position > 100 - 100) {
+        } else if (_position <= 5 && _position > 0) {
             pools[_poolId].bonusesPaid[3] += _bonus;
         }
     }
