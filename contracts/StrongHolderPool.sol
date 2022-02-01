@@ -45,6 +45,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
     address public nftRewardPool;
 
     uint256 public constant MAX_POOL_LENGTH = 100;
+    uint256 public minDeposit;
 
     Counters.Counter private _poolIndex;
 
@@ -56,6 +57,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
     event Withdrawn(uint256 indexed poolId, uint256 position, address account, uint256 amount);
     event Withheld(uint256 amount);
     event RewardPoolSet(address rewardPool);
+    event MinDepositSet(uint256 value);
     event PoolCreated(uint256 poolId);
 
     /**
@@ -65,6 +67,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         require(_aliumToken != address(0), "Reward token set zero address");
 
         rewardToken = _aliumToken;
+        minDeposit = 100_000;
     }
 
     /**
@@ -78,7 +81,7 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
         nonReentrant
     {
         require(_to != address(0), "Lock for zero address");
-        require(_amount >= 100_000, "Not enough for participate");
+        require(_amount >= minDeposit, "Not enough for participate");
 
         IERC20(rewardToken).safeTransferFrom(
             address(msg.sender),
@@ -206,6 +209,16 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
     function setNftRewardPool(address _rewardPool) external onlyOwner {
         nftRewardPool = _rewardPool;
         emit RewardPoolSet(_rewardPool);
+    }
+
+    /**
+     * @dev Set NFT reward pool.
+     */
+    function setMinDeposit(uint256 _minDeposit) external onlyOwner {
+        require(_minDeposit >= 100_000, "Very low deposit");
+
+        minDeposit = _minDeposit;
+        emit MinDepositSet(_minDeposit);
     }
 
     /**
