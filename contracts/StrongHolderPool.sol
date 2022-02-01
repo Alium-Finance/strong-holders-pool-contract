@@ -151,13 +151,14 @@ contract StrongHolderPool is IStrongHolder, Ownable, ReentrancyGuard {
     function userLockedPoolTokens(uint256 _poolId, address _account)
         external
         view
-        returns (uint256)
+        returns (uint256 balance)
     {
         Pool storage pool = pools[_poolId];
         uint256 l = pool.users.length;
         for (uint256 i; i < l; i++) {
             if (pool.users[i].account == _account) {
-                return pool.users[i].balance;
+                balance = pool.users[i].balance;
+                i = l;
             }
         }
     }
