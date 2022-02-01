@@ -4,8 +4,6 @@ import { ethers } from "hardhat";
 import { Signer } from "ethers";
 import { assert } from "chai";
 import { solidity } from "ethereum-waffle";
-const { constants } = ethers;
-const { MaxUint256 } = constants;
 
 chai.use(solidity);
 

@@ -5,12 +5,6 @@ import { Signer } from "ethers";
 import { assert } from "chai";
 import { solidity } from "ethereum-waffle";
 
-const {
-    expectRevert, // Assertions for transactions that should fail
-
-    // eslint-disable-next-line
-} = require("@openzeppelin/test-helpers");
-
 const { constants } = ethers;
 const { MaxUint256 } = constants;
 
@@ -36,6 +30,10 @@ function shuffle(array: Array<number>) {
 
 function randomIntFromInterval(min: number, max: number) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+function expectRevert(condition: any, message: string) {
+    expect(condition).to.revertedWith(message);
 }
 
 describe("StrongHolderPool", function () {
