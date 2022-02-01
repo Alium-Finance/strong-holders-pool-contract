@@ -19,7 +19,7 @@ contract AccessControlToken is AccessControlEnumerable {
      */
     function grantRole(bytes32 _role, address _account)
         public
-        override(AccessControlEnumerable)
+        override
         onlyRole(ADMIN_ROLE)
     {
         super.grantRole(_role, _account);
@@ -30,7 +30,7 @@ contract AccessControlToken is AccessControlEnumerable {
      */
     function revokeRole(bytes32 _role, address _account)
         public
-        override(AccessControlEnumerable)
+        override
         onlyRole(ADMIN_ROLE)
     {
         super.revokeRole(_role, _account);
@@ -41,7 +41,7 @@ contract AccessControlToken is AccessControlEnumerable {
      */
     function renounceRole(bytes32 _role, address _account)
         public
-        override(AccessControlEnumerable)
+        override
     {
         require(hasRole(_role, _account), "You has no role");
 

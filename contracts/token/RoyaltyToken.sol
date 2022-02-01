@@ -4,7 +4,7 @@ pragma solidity =0.8.4;
 
 import "../packages/@rarible/royalties/contracts/impl/RoyaltiesV1Impl.sol";
 import "../packages/@rarible/royalties/contracts/LibRoyaltiesV1.sol";
-import {AccessControlEnumerable, AccessControlToken} from "./AccessControlToken.sol";
+import { AccessControlEnumerable, AccessControlToken } from "./AccessControlToken.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165Storage.sol";
 
 contract RoyaltyToken is RoyaltiesV1Impl, AccessControlToken, ERC165Storage {
