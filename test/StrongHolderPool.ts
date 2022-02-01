@@ -1,4 +1,4 @@
-import chai from "chai";
+import chai, {expect} from "chai";
 
 import { ethers } from "hardhat";
 import { Signer } from "ethers";
@@ -366,7 +366,9 @@ describe("StrongHolderPool", function () {
                 const account = await sphMock.getAddress(i);
 
                 console.log('Expected reward:')
-                console.log((await sphMock.countReward(0, account)).toString())
+
+                let countedReward = await sphMock.countReward(0, account);
+                console.log(countedReward.toString())
                 console.log("");
 
                 console.log('total locked pool tokens from:')
@@ -380,13 +382,17 @@ describe("StrongHolderPool", function () {
                 console.log((await sphMock.poolWithheld(poolId)).toString());
                 console.log("");
 
-                events.map(({ args, event }: any) => {
+                var totalWithdraw = 0;
+                await events.map(({ args, event }: any) => {
                     if (event == "Withdrawn") {
                         console.log(`Withdrawn: ${i}`);
                         console.log(`poolId: ${args[0].toString()}`);
-                        console.log(`account: ${args[1].toString()}`);
-                        console.log(`amount: ${args[2].toString()}`);
+                        console.log(`position: ${args[1].toString()}`);
+                        console.log(`account: ${args[2].toString()}`);
+                        console.log(`amount: ${args[3].toString()}`);
                         console.log("");
+
+                        totalWithdraw += Number(args[3]);
                     }
                     if (event == "Withheld") {
                         console.log(`Withheld: ${i}`);
@@ -408,7 +414,21 @@ describe("StrongHolderPool", function () {
                     }
                 });
 
-                // todo: if equal bug
+                await new Promise<number>((resolve, reject) => {
+                    setTimeout(() => {
+                        if (totalWithdraw != 0) {
+                            resolve(totalWithdraw)
+                        } else {
+                            reject(0)
+                        }
+                    }, 100)
+                })
+
+                assert.equal(Number(countedReward), totalWithdraw, `Reward issue on ${i}`)
+
+                console.log(`Reward in ${i} (%):`)
+                console.log(totalWithdraw / 100000 * 100)
+
                 console.log("Locked pool tokens in range [0...4]");
                 console.log((await sphMock.totalLockedPoolTokensFrom(0, 81)).toString());
                 console.log((await sphMock.totalLockedPoolTokensFrom(0, 86)).toString());
