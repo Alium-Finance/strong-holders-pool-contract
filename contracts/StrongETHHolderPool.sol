@@ -39,11 +39,10 @@ contract StrongETHHolderPool is IStrongEthereumHolder, Ownable, ReentrancyGuard,
         mapping(uint256 => uint256) position;
     }
 
-    address public rewardToken;
     address public nftRewardPool;
 
     uint256 public constant MAX_POOL_LENGTH = 100;
-    uint256 public minDeposit;
+    uint256 public minDeposit = 100_000;
 
     Counters.Counter private _poolIndex;
 
@@ -57,17 +56,6 @@ contract StrongETHHolderPool is IStrongEthereumHolder, Ownable, ReentrancyGuard,
     event RewardPoolSet(address rewardPool);
     event MinDepositSet(uint256 value);
     event PoolCreated(uint256 poolId);
-
-    /**
-     * @dev Constructor. Set `_aliumToken` as reward token.
-     */
-    constructor(address _aliumToken) {
-        require(_aliumToken != address(0), "Reward token set zero address");
-
-        rewardToken = _aliumToken;
-        minDeposit = 100_000;
-    }
-
     /**
      * @dev Lock `_amount` for address `_to`. It create new position or update current,
      *     if already exist.
@@ -145,7 +133,7 @@ contract StrongETHHolderPool is IStrongEthereumHolder, Ownable, ReentrancyGuard,
     /**
      * @dev Get `_account` locked tokens by `_poolId`.
      */
-    function userLockedPoolTokens(uint256 _poolId, address _account)
+    function userLockedBalance(uint256 _poolId, address _account)
         external
         view
         returns (uint256 balance)
@@ -232,7 +220,7 @@ contract StrongETHHolderPool is IStrongEthereumHolder, Ownable, ReentrancyGuard,
     /**
      * @dev Get total locked tokens by `_poolId`.
      */
-    function totalLockedPoolTokens(uint256 _poolId)
+    function totalLocked(uint256 _poolId)
         public
         view
         returns (uint256 amount)
@@ -424,7 +412,7 @@ contract StrongETHHolderPool is IStrongEthereumHolder, Ownable, ReentrancyGuard,
         uint256 _balance,
         uint256 _percent
     ) private view returns (uint256 reward, uint256 withheld) {
-        uint256 _totalTokens = totalLockedPoolTokens(_poolId);
+        uint256 _totalTokens = totalLocked(_poolId);
         uint256 deposited = percentFrom(_percent, _balance);
         uint256 poolLeft = percentFrom(_percent, _totalTokens.sub(_balance));
         if (poolLeft < deposited) {
