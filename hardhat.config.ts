@@ -43,6 +43,10 @@ module.exports = {
     bscMainnet: {
       url: "https://bsc-dataseed.binance.org/",
       accounts: [config.privateKey]
+    },
+    metisMainnet: {
+      url: "https://andromeda.metis.io/?owner=1088",
+      accounts: [config.privateKey]
     }
   },
   solidity: {
