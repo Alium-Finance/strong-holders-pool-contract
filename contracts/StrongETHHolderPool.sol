@@ -2,7 +2,6 @@
 
 pragma solidity =0.8.4;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -10,6 +9,7 @@ import "./SendValueWithFallbackWithdraw.sol";
 import "./interfaces/IStrongEthereumHolder.sol";
 import "./interfaces/INFTRewardPool.sol";
 import "./interfaces/INFTRewardPool.sol";
+import "./VersionControl.sol";
 
 /**
  * @title StrongETHHolderPool - ETH coin pools. Who is strongest?
@@ -20,7 +20,7 @@ import "./interfaces/INFTRewardPool.sol";
  *   - Honest redistribution;
  *   - NFT reward on side NFT pool contract.
  */
-contract StrongETHHolderPool is IStrongEthereumHolder, Ownable, ReentrancyGuard, SendValueWithFallbackWithdraw {
+contract StrongETHHolderPool is IStrongEthereumHolder, VersionControl, ReentrancyGuard, SendValueWithFallbackWithdraw {
     using SafeMath for uint256;
 
     struct User {
@@ -56,6 +56,11 @@ contract StrongETHHolderPool is IStrongEthereumHolder, Ownable, ReentrancyGuard,
     event RewardPoolSet(address rewardPool);
     event MinDepositSet(uint256 value);
     event PoolCreated(uint256 poolId);
+
+    constructor()
+        VersionControl(keccak256(abi.encodePacked("{support:ETH,reward_pool:true}")))
+    { }
+
     /**
      * @dev Lock `_amount` for address `_to`. It create new position or update current,
      *     if already exist.
