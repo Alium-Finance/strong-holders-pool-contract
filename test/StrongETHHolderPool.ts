@@ -36,7 +36,7 @@ function expectRevert(condition: any, message: string) {
     expect(condition).to.revertedWith(message);
 }
 
-describe.only("StrongETHHolderPool", function () {
+describe("StrongETHHolderPool", function () {
     let accounts: Signer[];
 
     let OWNER_SIGNER: any;
@@ -75,6 +75,8 @@ describe.only("StrongETHHolderPool", function () {
 
         alm = await ERC20Mock.deploy("Mock Alium Token", "ALM");
         shp = await StrongETHHolderPool.deploy();
+
+        console.log(`Version hash: ${String(await shp.version())}`)
     });
 
     describe("getters", () => {
